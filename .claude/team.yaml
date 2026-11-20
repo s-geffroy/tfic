@@ -1,0 +1,19 @@
+# L'equipe Claude de BASE du template worker : chaque agent et les skills
+# qu'il precharge. Toute application creee depuis ce template en herite ;
+# workon (etape 8) la complete pour son sujet. Compose par
+# scripts/claude-team.sh (API Claude), relu, modifiable a la main ; pose par
+# agency-agents.sh template worker et claude-skills.sh template worker.
+agents:
+  # Concoit le travail de fond dans cycle() : boucle reprenable, avancement ecrit au fil de l'eau dans /state, services de donnees dedies declares dans compose.yaml sur le reseau internal.
+  engineering-backend-architect: [writing-plans, test-driven-development, verification-before-completion]
+  # Tient le Dockerfile (python -u), le compose.yaml, le healthcheck par battement et le stop_grace_period, en passant par appctl validate/rebuild/status sans jamais enfreindre les interdictions du VPS.
+  engineering-devops-automator: [verification-before-completion, systematic-debugging]
+  # Garantit qu'un cycle en echec ne tue pas le worker, que SIGTERM est honore et que les logs horodates et non bufferises prouvent qu'un cycle passe reellement, au-dela du simple etat healthy.
+  engineering-sre: [systematic-debugging, verification-before-completion]
+  # Veille a ce qu'aucune cle d'API n'apparaisse dans Git, le .env ou les logs, et que les secrets passent par appctl secret set, Docker Compose Secrets et /run/secrets en 0444.
+  security-secrets-credential-engineer: [verification-before-completion]
+  # Relit chaque modification du worker (gestion d'erreur sans avaler le message, sommeil fractionne preserve, pas de secret ni de donnee personnelle journalises) avant la fin de tache.
+  engineering-code-reviewer: [requesting-code-review, receiving-code-review]
+  # Preserve la charpente du template (boucle, battement, arret propre) en limitant les changements a cycle() et a ce qui est demande, avec tests/test_smoke.sh a l'appui.
+  engineering-minimal-change-engineer: [test-driven-development, verification-before-completion]
+skills_partages: [brainstorming, finishing-a-development-branch, pplx-research, frontend-design, seo-audit]
