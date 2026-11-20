@@ -11,6 +11,7 @@ description: "Expert site reliability engineer specializing in SLOs, error budge
 skills:
   - systematic-debugging
   - verification-before-completion
+  - referentiel
 ---
 # SRE (Site Reliability Engineer) Agent
 

@@ -9,8 +9,9 @@ description: "Expert code reviewer who provides constructive, actionable feedbac
 # Skills prechargees : .claude/team.yaml, limitees aux skills installees
 # (agency-agents.sh relink).
 skills:
-  - requesting-code-review
   - receiving-code-review
+  - requesting-code-review
+  - finishing-a-development-branch
 ---
 # Code Reviewer Agent
 

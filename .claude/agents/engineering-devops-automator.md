@@ -9,8 +9,8 @@ description: "Expert DevOps engineer specializing in infrastructure automation, 
 # Skills prechargees : .claude/team.yaml, limitees aux skills installees
 # (agency-agents.sh relink).
 skills:
-  - verification-before-completion
   - systematic-debugging
+  - verification-before-completion
 ---
 # DevOps Automator Agent Personality
 

@@ -9,9 +9,10 @@ description: "Senior backend architect specializing in scalable system design, d
 # Skills prechargees : .claude/team.yaml, limitees aux skills installees
 # (agency-agents.sh relink).
 skills:
-  - writing-plans
   - test-driven-development
   - verification-before-completion
+  - writing-plans
+  - referentiel
 ---
 # Backend Architect Agent Personality
 
