@@ -1,0 +1,15 @@
+occurrence_id,source_id,character_id,designation_in_witness,note
+O01_FC,S01,C_FATHER_CHRISTMAS,Christmas / Old Christmas,
+O02_SANTA,S02,C_SANTA_CLAUS,Santeclaus,
+O03_SANTA,S03,C_SANTA_CLAUS,St. Nicholas,"Le poème nomme St. Nicholas; rattachement à Santa Claus = convention ultérieure"
+O04_SINT,S04,C_SINTERKLAAS,Sint Nikolaas,
+O04_SERVANT,S04,C_KNECHT,knecht (anonyme),
+O05_PN,S05,C_PERE_NOEL,père Noël,
+O06_NAST,S06,C_SANTA_CLAUS,Santa Claus (notice LOC),
+O07_SANTA,S07,C_SANTA_CLAUS,Santa Claus,
+O07_FC,S07,C_FATHER_CHRISTMAS,Father Christmas,
+O08_AUTO,S08,C_SANTA_CLAUS,Santa Claus (notice LOC),
+O09_GUN,S09,C_SANTA_CLAUS,Santa Claus (légende),
+O10_NICH,S10,C_NICHOLAS,Nikolaus,
+O10_KRAM,S10,C_KRAMPUS,Krampus,
+O11_RUD,S11,C_RUDOLPH,Rudolph,

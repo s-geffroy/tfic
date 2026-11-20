@@ -1,0 +1,26 @@
+---
+/**
+ * Formule rendue à la compilation (KaTeX, sortie HTML + MathML pour les
+ * lecteurs d'écran). `explain` donne la lecture en prose, toujours affichée.
+ */
+import katex from 'katex';
+
+interface Props {
+  tex: string;
+  display?: boolean;
+  explain?: string;
+}
+const { tex, display = false, explain } = Astro.props;
+const html = katex.renderToString(tex, { displayMode: display, output: 'htmlAndMathml', throwOnError: true, strict: 'error' });
+---
+
+{
+  display ? (
+    <figure class="math-block">
+      <Fragment set:html={html} />
+      {explain && <figcaption class="small muted">{explain}</figcaption>}
+    </figure>
+  ) : (
+    <Fragment set:html={html} />
+  )
+}

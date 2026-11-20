@@ -7,3 +7,12 @@ __pycache__/
 # Marqueur local du VPS, lu par scripts/infra-reconcile.sh : il dit que cette
 # application redemarre au boot de CETTE machine. Rien a faire dans un depot.
 .autostart
+
+# Documents de travail TFIC-PN : hors Git (depot public). Le site n'en publie
+# qu'une selection copiee dans site/data/source/.
+specs/
+
+# Site
+site/node_modules/
+site/dist/
+site/.astro/

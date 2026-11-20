@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+import { SCIENCE_STATUS, SCIENCE_VERSION, SITE_VERSION, VERSION_HISTORY } from '../lib/version.ts';
+---
+
+<Base title="Versions" description="Historique des versions scientifiques TFIC-PN (v0.3 à v0.5.1, toutes DRAFT) et version du site." section="versions">
+  <p class="eyebrow">Historique</p>
+  <h1>Versions</h1>
+  <p class="lede">
+    Deux axes de version indépendants. La version <strong>scientifique</strong> (v{SCIENCE_VERSION}, {SCIENCE_STATUS}) concerne le corpus et
+    la théorie. La version du <strong>site</strong> (v{SITE_VERSION}) concerne le logiciel. « Dernière version » ne veut pas dire « approuvée » :
+    aucune version n’est approuvée.
+  </p>
+  <div class="table-wrap">
+    <table>
+      <caption>Versions scientifiques (aucune n’est effacée par la suivante)</caption>
+      <thead><tr><th scope="col">Version</th><th scope="col">Date</th><th scope="col">Statut</th><th scope="col">Contenu</th></tr></thead>
+      <tbody>
+        {[...VERSION_HISTORY].reverse().map((v) => (
+          <tr><th scope="row">v{v.version}</th><td>{v.date}</td><td><code>{v.status}</code></td><td>{v.summary}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <h2>Principes de versionnement</h2>
+  <ul>
+    <li>Une correction ne réécrit pas l’historique : chaque version garde ses fichiers, et les corrections vivent dans de nouveaux fichiers ou en surcouche tracée (invariant I3).</li>
+    <li>Statuts admis : <code>DRAFT</code>, <code>EXPERIMENTAL</code>, <code>NOT_TESTED</code>. Le site n’affiche jamais un statut d’approbation qui n’existe pas.</li>
+    <li>Emplacement canonique déclaré des documents de travail : un espace de stockage privé. Ce site n’en publie qu’une sélection de données.</li>
+  </ul>
+</Base>

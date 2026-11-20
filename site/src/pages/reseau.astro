@@ -1,0 +1,142 @@
+---
+import Base from '../layouts/Base.astro';
+import { dataset } from '../lib/data.ts';
+import { buildGraph } from '../lib/graph.ts';
+import { EDGE_STYLE, layoutGraph } from '../lib/graph-layout.ts';
+import { CATEGORY_LABEL, RELATION_LABEL, type EdgeCategory } from '../lib/semantics.ts';
+import { href } from '../lib/url.ts';
+
+const d = dataset();
+const levels = [
+  { key: 'occurrences', title: 'Occurrences des témoins v0.5', graph: buildGraph(d, 'occurrences') },
+  { key: 'v04', title: 'Relations du registre v0.4 (étiquettes « Personnage@contexte »)', graph: buildGraph(d, 'v04') },
+] as const;
+const layouts = levels.map((l) => ({ ...l, layout: layoutGraph(l.graph) }));
+const cats = Object.keys(CATEGORY_LABEL) as EdgeCategory[];
+const EVID = { attested: 'attestée', hypothesis: 'non documentée (hypothèse)', rejected: 'rejetée (contrôle négatif)' } as const;
+const color: Record<EdgeCategory, string> = {
+  distinction: 'var(--fir)',
+  association: 'var(--link)',
+  filiation_hypothetique: 'var(--ochre)',
+  etiquette_catalogue: 'var(--violet)',
+  identite_rejetee: 'var(--brick)',
+};
+---
+
+<Base title="Réseau" description="Graphe typé et temporel des relations documentées entre occurrences et personnages. Seules les arêtes attestées sont affichées par défaut ; tableau équivalent." section="reseau">
+  <p class="eyebrow">Graphe typé et temporel</p>
+  <h1>Réseau</h1>
+  <p class="lede">
+    Chaque arête vient d’une relation <strong>déclarée et sourcée</strong>. Aucune n’est créée parce que deux figures partagent des motifs.
+    Par défaut, seules les arêtes attestées s’affichent. Les hypothèses et les contrôles négatifs se montrent à la demande.
+  </p>
+
+  <form class="filters" id="net-controls" aria-label="Réglages du réseau">
+    <label>Niveau de granularité
+      <select name="level">{layouts.map((l) => <option value={l.key}>{l.title}</option>)}</select>
+    </label>
+    <fieldset>
+      <legend>Arêtes non attestées</legend>
+      <div class="checks">
+        <label><input type="checkbox" name="hypothesis" /> filiations non documentées (hypothèses)</label>
+        <label><input type="checkbox" name="rejected" /> identités rejetées (contrôles négatifs)</label>
+      </div>
+    </fieldset>
+  </form>
+
+  <div class="legend sans small" aria-label="Légende">
+    {cats.map((c) => (
+      <span class="legend-item">
+        <svg width="46" height="12" aria-hidden="true"><line x1="2" y1="6" x2="44" y2="6" stroke={color[c]} stroke-width="3" stroke-dasharray={EDGE_STYLE[c].dash} /></svg>
+        <strong>{EDGE_STYLE[c].code}</strong> {CATEGORY_LABEL[c]}
+      </span>
+    ))}
+  </div>
+
+  {layouts.map(({ key, title, layout }) => (
+    <section class="net" data-level={key} aria-label={title}>
+      <h2>{title}</h2>
+      <div class="svg-wrap">
+        <svg viewBox={`0 0 ${layout.width} ${layout.height}`} role="img" aria-labelledby={`t-${key}`} class="net-svg">
+          <title id={`t-${key}`}>{title} : {layout.nodes.length} nœuds, {layout.edges.length} relations. Le tableau ci-dessous en donne l’équivalent.</title>
+          {layout.ticks.map((t) => (
+            <g class="tick"><line x1={t.x} y1="24" x2={t.x} y2={layout.height - 24} /><text x={t.x} y="16" text-anchor="middle">{t.year}</text></g>
+          ))}
+          {layout.lanes.map((l) => (
+            <g class="lane"><line x1="160" y1={l.y} x2={layout.width - 20} y2={l.y} /><text x="8" y={l.y + 4}>{l.label}</text></g>
+          ))}
+          {layout.edges.map((e) => (
+            <g class="edge" data-edge={e.id} data-evidence={e.evidence} tabindex="0" role="button" aria-label={`${e.id} : ${e.from} ${RELATION_LABEL[e.relation] ?? e.relation} ${e.to}, ${EVID[e.evidence]}. Détails.`}>
+              <path d={e.path} fill="none" stroke={color[e.category]} stroke-width="3" stroke-dasharray={EDGE_STYLE[e.category].dash} />
+              <path d={e.path} fill="none" stroke="transparent" stroke-width="14" />
+              <text x={e.lx} y={e.ly} text-anchor="middle" class="edge-label">{e.id} {EDGE_STYLE[e.category].code}</text>
+            </g>
+          ))}
+          {layout.nodes.map((n) => (
+            <g class={`node k-${n.kind}`}>
+              {n.kind === 'character' ? <rect x={n.x - 7} y={n.y - 7} width="14" height="14" /> : <circle cx={n.x} cy={n.y} r="7" />}
+              <text x={n.x} y={n.y + n.labelDy} text-anchor="middle">{n.kind === 'v04_label' ? n.label : n.id}</text>
+            </g>
+          ))}
+        </svg>
+      </div>
+      <p class="small muted">Axe horizontal : année de l’édition ou du témoin. Les carrés à droite sont des personnages (sans date).</p>
+    </section>
+  ))}
+
+  <aside id="edge-panel" class="callout info" aria-live="polite" hidden>
+    <p class="small muted" style="margin:0">Sélectionnez une arête pour afficher ses preuves.</p>
+  </aside>
+
+  <h2 id="tableau">Tableau des relations (équivalent accessible)</h2>
+  {layouts.map(({ key, title, graph }) => (
+    <div class="table-wrap">
+      <table data-level-table={key}>
+        <caption>{title}</caption>
+        <thead><tr><th scope="col">ID</th><th scope="col">Sujet</th><th scope="col">Relation</th><th scope="col">Objet</th><th scope="col">Catégorie</th><th scope="col">Statut</th><th scope="col">Preuve</th><th scope="col">Localisateur / portée</th><th scope="col">Note</th></tr></thead>
+        <tbody>
+          {graph.edges.map((e) => (
+            <tr id={`rel-${e.id}`} data-edge-row={e.id} data-evidence={e.evidence} data-from={e.from} data-to={e.to} data-relation={RELATION_LABEL[e.relation] ?? e.relation} data-status={e.status} data-locator={e.locator} data-note={[e.note, ...e.corrections].filter(Boolean).join(' — ')} data-category={CATEGORY_LABEL[e.category]} data-evlabel={EVID[e.evidence]} data-sources={e.evidenceSourceIds.join(' ')} data-proof={e.proofUrl}>
+              <th scope="row"><code>{e.id}</code></th>
+              <td><code>{e.from}</code></td>
+              <td>{RELATION_LABEL[e.relation] ?? e.relation}</td>
+              <td><code>{e.to}</code></td>
+              <td>{CATEGORY_LABEL[e.category]}</td>
+              <td><code>{e.status}</code><br /><span class="small muted">{EVID[e.evidence]}</span></td>
+              <td>
+                {e.evidenceSourceIds.map((s) => <><a href={href(`corpus/${s}`)}><code>{s}</code></a> </>)}
+                {e.proofUrl && <a href={e.proofUrl} rel="noopener external">source</a>}
+              </td>
+              <td>{e.locator}</td>
+              <td>{e.note}{e.corrections.map((c) => <><br /><span class="small muted">{c}</span></>)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  ))}
+</Base>
+
+<style>
+  .legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; margin: 1rem 0; }
+  .legend-item { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .svg-wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--rule); border-radius: 6px; }
+  .net-svg { min-width: 760px; width: 100%; height: auto; display: block; font-family: var(--sans); }
+  .net-svg :global(.tick line) { stroke: var(--rule); stroke-width: 1; }
+  .net-svg :global(.tick text), .net-svg :global(.lane text) { fill: var(--muted); font-size: 11px; }
+  .net-svg :global(.lane line) { stroke: var(--rule); stroke-dasharray: 2 4; }
+  .net-svg :global(.node circle), .net-svg :global(.node rect) { fill: var(--card); stroke: var(--ink); stroke-width: 2; }
+  .net-svg :global(.node text) { fill: var(--ink); font-size: 10px; }
+  .net-svg :global(.edge) { cursor: pointer; }
+  .net-svg :global(.edge-label) { fill: var(--ink-2); font-size: 10px; font-weight: 600; paint-order: stroke; stroke: var(--card); stroke-width: 3px; }
+  .net-svg :global(.edge:focus-visible path:first-child), .net-svg :global(.edge.selected path:first-child) { stroke-width: 6; }
+  .net-svg :global(.edge:focus) { outline: none; }
+  .net-svg :global(.edge[data-evidence='hypothesis']), .net-svg :global(.edge[data-evidence='rejected']) { display: none; }
+  :global(html.show-hypothesis) .net-svg :global(.edge[data-evidence='hypothesis']) { display: inline; }
+  :global(html.show-rejected) .net-svg :global(.edge[data-evidence='rejected']) { display: inline; }
+</style>
+
+<script>
+  import { initNetwork } from '../scripts/network.ts';
+  initNetwork();
+</script>

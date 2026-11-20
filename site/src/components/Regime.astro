@@ -1,0 +1,15 @@
+---
+/** Les quatre régimes de contenu de la spec : visuellement et sémantiquement distincts. */
+interface Props {
+  kind: 'fait' | 'hypothese' | 'demo' | 'experience';
+}
+const LABEL = {
+  fait: 'Fait attesté',
+  hypothese: 'Hypothèse / interprétation',
+  demo: 'Démonstration mathématique',
+  experience: 'Résultat expérimental',
+} as const;
+const { kind } = Astro.props;
+---
+
+<span class={`regime ${kind}`}>{LABEL[kind]}</span>

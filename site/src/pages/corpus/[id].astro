@@ -1,0 +1,142 @@
+---
+import Base from '../../layouts/Base.astro';
+import Regime from '../../components/Regime.astro';
+import StateBadge from '../../components/StateBadge.astro';
+import { dataset } from '../../lib/data.ts';
+import { gradeLabel, mediumLabel } from '../../lib/labels.ts';
+import type { SourceEntry } from '../../lib/model.ts';
+import { RELATION_LABEL, edgeEvidence } from '../../lib/semantics.ts';
+import { href } from '../../lib/url.ts';
+
+export function getStaticPaths() {
+  const d = dataset();
+  return [...d.sourcesV05, ...d.sourcesV04].map((s) => ({ params: { id: s.id }, props: { source: s } }));
+}
+
+interface Props {
+  source: SourceEntry;
+}
+const { source: s } = Astro.props;
+const d = dataset();
+const charBy = new Map(d.characters.map((c) => [c.id, c]));
+const vocab = new Map(d.vocabulary.filter((v) => v.domain === 'trait').map((v) => [v.code, v.definition]));
+const assertions = (s.corpus === 'v0.5' ? d.assertionsV05 : d.assertionsV04).filter((a) => a.sourceId === s.id);
+const occurrences = d.occurrences.filter((o) => o.sourceId === s.id);
+const occIds = new Set(occurrences.map((o) => o.id));
+const relations =
+  s.corpus === 'v0.5'
+    ? d.relationsV05.filter((r) => r.evidenceSourceIds.includes(s.id) || occIds.has(r.subject) || occIds.has(r.object))
+    : [];
+const links = d.crosswalk.filter((c) => (s.corpus === 'v0.5' ? c.v05 === s.id : c.v04 === s.id));
+const evidenceLabel = { attested: 'attestée', hypothesis: 'non documentée', rejected: 'rejetée' } as const;
+---
+
+<Base title={`${s.id} — ${s.title}`} description={`Fiche ${s.corpus} : ${s.title} (${s.dateLabel}). Témoin, niveau de preuve, limites et assertions sourcées.`} section="corpus">
+  <p class="eyebrow"><a href={href('corpus')}>Corpus</a> · {s.corpus === 'v0.5' ? 'témoin ciblé v0.5' : 'notice du registre v0.4'}</p>
+  <h1>{s.title}</h1>
+  <p><Regime kind="fait" /> <span class="small muted">au niveau de preuve indiqué ci-dessous, et seulement à ce niveau</span></p>
+
+  <dl class="meta">
+    <dt>Identifiant</dt><dd><code>{s.id}</code></dd>
+    {s.creator && <><dt>Créateur</dt><dd>{s.creator}</dd></>}
+    <dt>{s.corpus === 'v0.5' ? 'Date de l’édition consultée' : 'Date (registre)'}</dt><dd>{s.dateLabel}</dd>
+    <dt>{s.corpus === 'v0.5' ? 'Témoin consulté' : 'Détail vérifié'}</dt><dd>{s.witness || '—'}</dd>
+    <dt>Zone</dt><dd>{s.area || '—'}</dd>
+    <dt>Support</dt><dd>{mediumLabel(s.medium)}</dd>
+    <dt>Niveau de preuve</dt><dd>{gradeLabel(s.evidenceGrade)} <code class="small">{s.evidenceGrade}</code></dd>
+    {s.locator && <><dt>Localisateur</dt><dd>{s.locator}</dd></>}
+    <dt>Famille d’œuvre</dt><dd><code>{s.workFamily}</code> <span class="small muted">(indivisible pour toute partition entraînement/test)</span></dd>
+    {s.repository && <><dt>Institution</dt><dd>{s.repository}</dd></>}
+    <dt>Source institutionnelle</dt><dd><a href={s.url} rel="noopener external">{s.url}</a></dd>
+    <dt>Personnages rattachés</dt>
+    <dd>
+      {s.characterIds.length === 0 ? '—' : s.characterIds.map((c, i) => <>{i > 0 && ', '}<a href={href(`personnages/${charBy.get(c)?.slug ?? c}`)}>{charBy.get(c)?.label ?? c}</a></>)}
+      {s.corpus === 'v0.4' && <span class="small muted"> (catégorie du registre = étiquette de catalogue)</span>}
+    </dd>
+  </dl>
+
+  <div class="callout"><p><strong>Limites.</strong> {s.limitations || 'Non renseignées.'}</p></div>
+
+  {s.corrections.length > 0 && (
+    <div class="callout info">
+      <p><strong>Corrections v0.5.1</strong> (appliquées en surcouche ; le fichier d’origine reste intact)</p>
+      <ul>{s.corrections.map((c) => <li>{c}</li>)}</ul>
+    </div>
+  )}
+
+  {links.length > 0 && (
+    <>
+      <h2>Correspondance entre corpus</h2>
+      <ul>
+        {links.map((l) => {
+          const other = s.corpus === 'v0.5' ? l.v04 : l.v05;
+          return <li><a href={href(`corpus/${other}`)}><code>{other}</code></a> — <code>{l.link}</code> : {l.note}</li>;
+        })}
+      </ul>
+      <p class="small muted">Appariement déclaré explicitement œuvre par œuvre, jamais déduit d’un titre approchant.</p>
+    </>
+  )}
+
+  {occurrences.length > 0 && (
+    <>
+      <h2>Occurrences</h2>
+      <ul>
+        {occurrences.map((o) => (
+          <li><code>{o.id}</code> — « {o.designation} » → <a href={href(`personnages/${charBy.get(o.characterId)?.slug ?? o.characterId}`)}>{charBy.get(o.characterId)?.label}</a>{o.note && <span class="small muted"> ({o.note})</span>}</li>
+        ))}
+      </ul>
+      {occurrences.length > 1 && <p class="small">Ces occurrences restent <strong>distinctes</strong>, bien qu’elles figurent dans le même document.</p>}
+    </>
+  )}
+
+  <h2>Assertions sourcées</h2>
+  {assertions.length === 0 ? (
+    <p class="muted">Aucune assertion codée pour cette notice. Cela ne signifie pas que les traits sont absents.</p>
+  ) : (
+    <>
+      <p class="small muted">
+        {s.corpus === 'v0.5' ? 'Pré-annotation d’une seule passe éditoriale (PILOT_EDITOR), non arbitrée. ' : 'Codage v0.4, une seule passe. '}
+        « Indéterminé » signifie que la source consultée ne permet pas de conclure. Ce n’est jamais une absence.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <caption>Assertions de {s.id}</caption>
+          <thead><tr><th scope="col">ID</th>{s.corpus === 'v0.5' && <th scope="col">Occurrence</th>}<th scope="col">Trait</th><th scope="col">État</th><th scope="col">Valeur</th><th scope="col">Localisateur</th><th scope="col">Niveau</th><th scope="col">Note</th></tr></thead>
+          <tbody>
+            {assertions.map((a) => (
+              <tr>
+                <th scope="row"><code>{a.id}</code></th>
+                {s.corpus === 'v0.5' && <td><code>{a.occurrenceId}</code></td>}
+                <td><span title={vocab.get(a.trait) ?? ''}>{a.trait}</span></td>
+                <td><StateBadge state={a.state} /></td>
+                <td>{a.value ?? '—'}</td>
+                <td>{a.locator || <span class="muted">non renseigné</span>}</td>
+                <td>{gradeLabel(a.evidenceGrade)}{a.inference === 'INTERPRETIVE_IN_SOURCE' && <><br /><span class="small muted">inférence interne au témoin</span></>}</td>
+                <td>
+                  {a.note}
+                  {a.supersededBy && <><br /><strong class="small">Remplacée par <code>{a.supersededBy}</code></strong></>}
+                  {a.corrections.map((c) => <><br /><span class="small muted">{c}</span></>)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  )}
+
+  {relations.length > 0 && (
+    <>
+      <h2>Relations</h2>
+      <ul>
+        {relations.map((r) => (
+          <li>
+            <code>{r.id}</code> : <code>{r.subject}</code> — {RELATION_LABEL[r.relation] ?? r.relation} — <code>{r.object}</code>
+            · statut <code>{r.status}</code> ({evidenceLabel[edgeEvidence(r)]}) · {r.locator}. <span class="muted">{r.note}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="small"><a href={href('reseau')}>Voir dans le réseau</a></p>
+    </>
+  )}
+</Base>

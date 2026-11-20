@@ -1,0 +1,9 @@
+---
+import { href } from '../lib/url.ts';
+interface Props {
+  id: string;
+}
+const { id } = Astro.props;
+---
+
+<a href={href(`corpus/${id}`)}><code>{id}</code></a>

@@ -1,0 +1,150 @@
+---
+import Base from '../layouts/Base.astro';
+import MathTex from '../components/MathTex.astro';
+import Regime from '../components/Regime.astro';
+import { href } from '../lib/url.ts';
+
+const invariants = [
+  ['I1', 'Traçabilité', 'Toute assertion et tout lien historique portent une provenance (source, témoin, localisateur).'],
+  ['I2', 'Temporalité', 'La date d’une attestation n’est pas la date d’origine de la coutume.'],
+  ['I3', 'Révision', 'Une correction ne supprime pas l’assertion antérieure : elle est versionnée.'],
+  ['I4', 'Contradictions', 'Soutiens positifs et négatifs sont enregistrés côte à côte, sans explosion déductive.'],
+  ['I5', 'Manquants', 'Indéterminé (UNKNOWN) n’est pas nié (ABSENT).'],
+  ['I6', 'Incertitude', 'Les degrés de fiabilité sont séparés des valeurs de vérité documentaires.'],
+  ['I7', 'Niveau', 'Un type pluralisable (« un Krampus ») n’est pas forcé dans une entité individuelle.'],
+  ['I8', 'Biais', 'La fréquence dans les sources conservées n’est pas la fréquence des pratiques historiques.'],
+] as const;
+---
+
+<Base title="Théorie" description="Cadre formel TFIC-PN : objets, trois relations non compensatoires, invariants I1–I8 et propositions P1–P4 avec leurs limites." section="theorie">
+  <p class="eyebrow">Cadre formel · v0.3 consolidé en v0.4–v0.5</p>
+  <h1>Théorie</h1>
+  <p class="lede">
+    Le cadre <strong>propose</strong> une manière de poser le problème. Il n’a pas été validé empiriquement. Les résultats
+    mathématiques ci-dessous portent sur des modèles explicites : ils ne démontrent rien sur l’histoire, et encore moins
+    l’existence physique d’un personnage.
+  </p>
+
+  <nav class="toc" aria-label="Sommaire">
+    <ol>
+      <li><a href="#notions">Notions</a></li>
+      <li><a href="#relations">Trois relations, aucune implication automatique</a></li>
+      <li><a href="#invariants">Invariants I1–I8</a></li>
+      <li><a href="#propositions">Propositions P1–P4</a></li>
+      <li><a href="#similarite">Similarité et couverture</a></li>
+      <li><a href="#modeles">Modèles rivaux</a></li>
+      <li><a href="#dynamique">Modèle dynamique (illustratif)</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="notions">Notions</h2>
+  <dl class="meta">
+    <dt>Document</dt><dd>Trace consultable : une édition datée, un objet, une notice. Jamais une « tradition » abstraite.</dd>
+    <dt>Occurrence</dt><dd>Présence d’un personnage dans un document. Un même livre peut en contenir plusieurs : <em>Karl Krinken</em> (éd. 1878) contient un Santa Claus <em>et</em> un Father Christmas.</dd>
+    <dt>Personnage</dt><dd>Catégorie d’individuation (Santa Claus, Rudolph) ou type pluralisable (un Krampus).</dd>
+    <dt>Tradition</dt><dd>Ensemble situé de pratiques : un lieu, une période, une communauté.</dd>
+    <dt>Assertion</dt><dd>Jugement atomique sur une occurrence, avec un état (attesté, nié, indéterminé, conflit, non applicable), un localisateur et un niveau de preuve.</dd>
+    <dt>Relation</dt><dd>Lien typé entre occurrences ou personnages. Il porte une source et un statut probatoire.</dd>
+  </dl>
+
+  <h2 id="relations">Trois relations, aucune implication automatique</h2>
+  <p>L’« identité » d’un personnage se décompose en trois composantes <strong>non compensatoires</strong>. Aucune moyenne globale ne les résume.</p>
+  <h3>R — Reconnaissance</h3>
+  <MathTex display tex={String.raw`R(k \mid s, c, t) = \Pr_{a \sim A_{c,t}}\big[\, Y_a(s) = k \,\big]`} explain="Proportion des répondants a d’une population définie (culture c, période t) qui identifient le stimulus s comme le personnage k. C’est une fréquence de réponses, pas une probabilité d’existence." />
+  <h3>Q — Co-identification</h3>
+  <MathTex display tex={String.raw`Q_{c,t}(k_i, k_j) = \Pr\big(\text{un acteur situe } k_i \text{ et } k_j \text{ sur le même personnage}\big)`} explain="Fréquence, dans une culture et une période, des acteurs qui emploient deux désignations pour le même personnage. Elle ne démontre aucune chaîne de filiation." />
+  <h3>H — Filiation documentaire</h3>
+  <p>
+    Un multigraphe temporel orienté <MathTex tex={String.raw`G_H = (\mathcal{O}, E_H)`} /> dont chaque arc est typé
+    (copie, adaptation, emprunt, fusion, réinterprétation, hypothèse) et porte une source. Une fusion peut exiger une hyperarête
+    <MathTex tex={String.raw`\{o_a, o_b\} \to o_c`} />. Le statut « non prouvé » ne vaut jamais « faux ».
+  </p>
+  <MathTex display tex={String.raw`s \text{ élevée} \not\Rightarrow E_H, \qquad \text{accompagne} \not\Rightarrow \text{même personnage}, \qquad Q \not\Rightarrow E_H`} explain="Une forte similarité ne prouve pas une filiation. Accompagner n’est pas être le même personnage. Être co-identifié ne prouve pas une transmission." />
+
+  <h2 id="invariants">Invariants I1–I8</h2>
+  <p class="small muted">
+    La spécification du site parle de « huit axiomes ». Ce sont en fait les huit invariants de la v0.3 : des règles de représentation,
+    pas des axiomes au sens logique.
+  </p>
+  <div class="table-wrap">
+    <table>
+      <caption>Invariants de représentation</caption>
+      <thead><tr><th scope="col">Code</th><th scope="col">Nom</th><th scope="col">Règle</th></tr></thead>
+      <tbody>{invariants.map(([c, n, r]) => <tr><th scope="row">{c}</th><td>{n}</td><td>{r}</td></tr>)}</tbody>
+    </table>
+  </div>
+
+  <h2 id="propositions">Propositions P1–P4</h2>
+  <p>Ce sont des résultats élémentaires et connus. L’éventuelle nouveauté du programme serait une intégration <em>validée</em>, pas ces preuves.</p>
+
+  <section class="theorem" aria-labelledby="p1">
+    <h3 id="p1">P1 — La similarité locale n’est pas transitive <Regime kind="demo" /></h3>
+    <dl>
+      <dt>Énoncé</dt><dd>Une relation de proximité par seuil <MathTex tex={String.raw`x \sim y \iff |x - y| \le \tau`} /> n’est pas, en général, une relation d’équivalence.</dd>
+      <dt>Hypothèses</dt><dd>Traits réels, seuil <MathTex tex={String.raw`\tau > 0`} /> fixé.</dd>
+      <dt>Démonstration</dt><dd>Avec <MathTex tex={String.raw`a = 0,\ b = 0{,}6,\ c = 1{,}2`} /> et <MathTex tex={String.raw`\tau = 0{,}7`} /> : <MathTex tex={String.raw`a \sim b`} /> et <MathTex tex={String.raw`b \sim c`} />, mais <MathTex tex={String.raw`|a - c| = 1{,}2 > 0{,}7`} />.</dd>
+      <dt>Interprétation</dt><dd>Une chaîne de ressemblances ne définit pas une identité.</dd>
+      <dt>Limite</dt><dd>Ne dit rien de la façon dont des humains catégorisent réellement.</dd>
+    </dl>
+  </section>
+
+  <section class="theorem" aria-labelledby="p2">
+    <h3 id="p2">P2 — On ne peut pas identifier une ascendance par les seuls traits <Regime kind="demo" /></h3>
+    <dl>
+      <dt>Énoncé</dt><dd>Aucune fonction des seules observations <MathTex tex="x" /> ne distingue, en général, une copie <MathTex tex={String.raw`A \to B`} /> d’une convergence indépendante.</dd>
+      <dt>Hypothèses</dt><dd>Deux histoires distinctes produisent les mêmes observations <MathTex tex={String.raw`x_A = x_B`} />.</dd>
+      <dt>Démonstration</dt><dd>Contre-exemple constructif : la fonction reçoit des entrées identiques sous les deux histoires et renvoie donc la même sortie.</dd>
+      <dt>Interprétation</dt><dd>Une filiation exige des preuves extérieures aux traits : datation, témoins intermédiaires, mentions de transmission.</dd>
+      <dt>Limite</dt><dd>Ce n’est pas un théorème historique nouveau, seulement un garde-fou contre les inférences abusives.</dd>
+    </dl>
+  </section>
+
+  <section class="theorem" aria-labelledby="p3">
+    <h3 id="p3">P3 — Robustesse locale d’un classificateur linéaire <Regime kind="demo" /></h3>
+    <dl>
+      <dt>Énoncé</dt><dd>Pour <MathTex tex={String.raw`f(x) = \mathbb{1}\{w^\top x + b > 0\}`} /> et une marge <MathTex tex={String.raw`m = w^\top x + b > 0`} />, toute perturbation <MathTex tex={String.raw`\|\delta\|_2 < m / \|w\|_2`} /> conserve la classe.</dd>
+      <dt>Hypothèses</dt><dd>Règle linéaire, norme euclidienne.</dd>
+      <dt>Démonstration</dt><dd>Par Cauchy-Schwarz, <MathTex tex={String.raw`|w^\top \delta| \le \|w\|_2 \|\delta\|_2 < m`} />, donc <MathTex tex={String.raw`w^\top(x+\delta) + b > 0`} />.</dd>
+      <dt>Interprétation</dt><dd>Illustre la robustesse d’une <em>règle</em>.</dd>
+      <dt>Limite</dt><dd>Ne prouve pas la robustesse de l’identité perçue par des humains.</dd>
+    </dl>
+  </section>
+
+  <section class="theorem" aria-labelledby="p4">
+    <h3 id="p4">P4 — Préservation du simplexe <Regime kind="demo" /></h3>
+    <dl>
+      <dt>Énoncé</dt><dd>Si <MathTex tex="p" /> et <MathTex tex="u" /> sont des distributions, <MathTex tex="W" /> stochastique par lignes et <MathTex tex={String.raw`\epsilon \in [0,1]`} />, alors <MathTex tex={String.raw`p' = (1-\epsilon)\,pW + \epsilon u`} /> est une distribution.</dd>
+      <dt>Hypothèses</dt><dd>Vecteurs lignes, entrées positives.</dd>
+      <dt>Démonstration</dt><dd><MathTex tex={String.raw`pW`} /> est positive et de somme 1. Une combinaison convexe de deux distributions en est une.</dd>
+      <dt>Interprétation</dt><dd>Établit la cohérence arithmétique d’un modèle de diffusion.</dd>
+      <dt>Limite</dt><dd>Ne dit rien de la validité historique du processus.</dd>
+    </dl>
+  </section>
+
+  <h2 id="similarite">Similarité et couverture</h2>
+  <MathTex display tex={String.raw`d_w(i,j) = \sqrt{\frac{\sum_{k \in K_{ij}} w_k\, \delta_k(i,j)^2}{\sum_{k \in K_{ij}} w_k}}, \qquad \kappa_{ij} = \frac{|K_{ij}|}{|K|}`} explain="K_ij est l’ensemble des traits observés et comparables pour les deux occurrences ; δ_k dépend du type de trait. Un trait inconnu n’est pas un zéro : il sort de K_ij. On ne calcule pas si K_ij est vide. κ mesure la part des traits effectivement comparés." />
+  <p><Regime kind="hypothese" /> La similarité reste descriptive. Elle ne crée jamais d’arête dans le <a href={href('reseau')}>réseau</a>.</p>
+
+  <h2 id="modeles">Modèles rivaux</h2>
+  <ul>
+    <li><strong>Essentialisme fort :</strong> un noyau de traits invariants serait indispensable.</li>
+    <li><strong>Prototype / air de famille :</strong> catégorie distribuée, appartenance graduée.</li>
+    <li><strong>Filiation historique :</strong> la transmission documentée prédomine.</li>
+    <li><strong>Convention référentielle :</strong> c’est la communauté de désignation qui fait l’identité.</li>
+    <li><strong>Modèle intégratif TFIC :</strong> garde R, Q et H séparés. Il ne l’emporte que s’il prédit mieux hors échantillon, avec une pénalité de complexité. La meilleure explication peut être plus simple.</li>
+  </ul>
+  <div class="callout">
+    <p>
+      <strong>Point ouvert (revue v0.5.1).</strong> Le modèle intégratif refuse toute moyenne globale, mais aucun critère de perte
+      n’est fixé pour décider qu’il perd. Tant que ce critère n’est pas préenregistré, il n’est pas réfutable.
+    </p>
+  </div>
+
+  <h2 id="dynamique">Modèle dynamique (illustratif)</h2>
+  <MathTex display tex={String.raw`p_c(t+1) = (1-\eta_c) \sum_d W_{cd}(t)\, p_d(t)\, Q_{d,t} + \eta_c\, u_c(t)`} explain="Mélange entre cultures c et d (W), co-identification (Q) et innovation (η, u). Aucun paramètre n’est estimé." />
+  <p>
+    <Regime kind="hypothese" /> Avec le corpus actuel, les paramètres W, Q et η ne sont pas identifiables : il y a plus d’inconnues que
+    d’observations indépendantes. Ce modèle sert d’illustration, pas d’outil d’estimation. Une fusion qui crée des traits nouveaux exigerait
+    en plus un mécanisme non linéaire.
+  </p>
+</Base>

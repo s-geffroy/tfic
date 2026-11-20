@@ -1,0 +1,88 @@
+---
+import 'katex/dist/katex.min.css';
+import '../styles/global.css';
+import { href } from '../lib/url.ts';
+import { SCIENCE_DATE, SCIENCE_STATUS, SCIENCE_VERSION, SITE_VERSION } from '../lib/version.ts';
+
+interface Props {
+  title: string;
+  description: string;
+  section?: string;
+}
+
+const { title, description, section = '' } = Astro.props;
+const fullTitle = title === 'Accueil' ? 'TFIC-PN — Identité culturelle du Père Noël' : `${title} · TFIC-PN`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const nav = [
+  ['', 'Accueil'],
+  ['theorie', 'Théorie'],
+  ['corpus', 'Corpus'],
+  ['personnages', 'Personnages'],
+  ['reseau', 'Réseau'],
+  ['laboratoire', 'Laboratoire'],
+  ['methodologie', 'Méthodologie'],
+  ['bibliographie', 'Bibliographie'],
+  ['versions', 'Versions'],
+  ['telechargements', 'Téléchargements'],
+] as const;
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+    <link rel="icon" type="image/svg+xml" href={href('favicon.svg')} />
+    <link rel="sitemap" href={href('sitemap-index.xml')} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta name="tfic-science-version" content={`${SCIENCE_VERSION}-${SCIENCE_STATUS}`} />
+  </head>
+  <body>
+    <a class="skip" href="#contenu">Aller au contenu</a>
+    <header class="site-head">
+      <div class="wrap">
+        <a class="brand" href={href()}>TFIC-PN <span>· identité culturelle du Père Noël</span></a>
+        <nav class="nav" aria-label="Navigation principale">
+          <ul>
+            {
+              nav.map(([path, label]) => (
+                <li>
+                  <a href={href(path)} aria-current={section === path ? 'page' : undefined}>
+                    {label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <div class="status-band" role="note" aria-label="Statut de version">
+      <div class="wrap">
+        <span><strong>Science v{SCIENCE_VERSION} — {SCIENCE_STATUS}</strong> (non approuvé, non préenregistré, {SCIENCE_DATE})</span>
+        <span>Site v{SITE_VERSION}</span>
+        <span>Aucun résultat de reconnaissance humaine à ce jour</span>
+      </div>
+    </div>
+    <main id="contenu" class="wrap">
+      <slot />
+    </main>
+    <footer class="site-foot">
+      <div class="wrap">
+        <p>
+          Programme de recherche TFIC-PN, version de travail. Textes et données dérivées sous{" "}
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.fr">CC BY-SA 4.0</a>, code sous licence MIT. Les sources
+          citées restent sous les droits de leurs institutions : ce site n’héberge aucune reproduction d’archive.
+        </p>
+        <p>Aucun cookie, aucune mesure d’audience, aucune collecte de réponses.</p>
+      </div>
+    </footer>
+  </body>
+</html>

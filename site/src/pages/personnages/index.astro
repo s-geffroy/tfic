@@ -1,0 +1,35 @@
+---
+import Base from '../../layouts/Base.astro';
+import { dataset } from '../../lib/data.ts';
+import { CHARACTER_TEXT } from '../../lib/characters-text.ts';
+import { href } from '../../lib/url.ts';
+
+const d = dataset();
+const KIND = { individual: 'personnage individuel', type: 'type de figure (pluralisable)', auxiliary: 'auxiliaire', family: 'famille culturelle' } as const;
+const count = (id: string) => ({
+  v05: d.occurrences.filter((o) => o.characterId === id).length,
+  v04: d.sourcesV04.filter((s) => s.characterIds.includes(id)).length,
+});
+---
+
+<Base title="Personnages" description="Fiches distinctes : saint Nicolas, Sinterklaas, Santa Claus, Father Christmas, Père Noël, Krampus, Père Fouettard, Rudolph. Associer n’est pas identifier." section="personnages">
+  <p class="eyebrow">Fiches distinctes</p>
+  <h1>Personnages</h1>
+  <p class="lede">
+    Tous les donateurs hivernaux ne sont pas des variantes du Père Noël. Chaque fiche est séparée : une association rituelle
+    (accompagner, appartenir au même univers) n’est jamais une identité.
+  </p>
+  <div class="grid">
+    {d.characters.map((c) => {
+      const n = count(c.id);
+      return (
+        <article class="card">
+          <h3><a href={href(`personnages/${c.slug}`)}>{c.label}</a></h3>
+          <p class="small muted">{KIND[c.kind]}</p>
+          <p>{CHARACTER_TEXT[c.id]?.summary}</p>
+          <p class="small">{n.v05} occurrence(s) v0.5 · {n.v04} notice(s) v0.4</p>
+        </article>
+      );
+    })}
+  </div>
+</Base>

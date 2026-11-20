@@ -1,0 +1,8 @@
+id,left,right,relation,proof_url,scope,evidence_status
+R001,FatherChristmas@Warner1864,Santa@Warner1864,distinct_in_source,https://blogs.loc.gov/folklife/2018/12/christmas-cousins-father-christmas-and-santa-claus/,Warner 1864,institutional_interpretation
+R002,Nicholas@Beisinger1897,Krampus@Beisinger1897,distinct_in_source,https://blogs.loc.gov/folklife/2025/12/nicholas-and-krampus-a-heartwarming-tale-of-love-and-monsters/,Beisinger 1897,translation
+R003,Nicholas@Beisinger1897,Krampus@Beisinger1897,accompanies,https://blogs.loc.gov/folklife/2025/12/nicholas-and-krampus-a-heartwarming-tale-of-love-and-monsters/,Beisinger 1897,translation
+R004,Sinterklaas@Schenkman1850,Servant@Schenkman1850,distinct_roles,https://www.kb.nl/en/discover-admire/masterpieces/sint-nikolaas-en-zijn-knecht,Schenkman 1850,catalogue
+R005,Santa@May1939,Rudolph@May1939,associated_character,https://www.americanhistory.si.edu/ne/collections/object/nmah_1200958,May 1939,catalogue
+R006,NastSanta@Camp1863,NastSanta@ChristmasEve1863,same_illustrated_named_character,https://www.metmuseum.org/art/collection/search/429261,Harper issue Jan 1863,catalogue
+R007,FatherChristmas@1610,FatherChristmas@1653,hypothesized_cultural_continuity,https://blogs.loc.gov/folklife/2018/12/in-comes-i-old-father-christmas-surprising-history-of-a-christmas-icon/,1610-1653,hypothesis_not_attested_path

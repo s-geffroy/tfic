@@ -1,0 +1,68 @@
+---
+import Base from '../layouts/Base.astro';
+import { dataset } from '../lib/data.ts';
+import { gradeLabel } from '../lib/labels.ts';
+import { href } from '../lib/url.ts';
+
+const d = dataset();
+const KIND: Record<string, string> = {
+  EDITORIAL_TRANSCRIPTION: 'Source primaire (transcription éditoriale)',
+  MODERN_RECENSION: 'Source primaire (recension moderne)',
+  PAGE_TRANSCRIPTION: 'Source primaire (transcription de page)',
+  EDITION_TRANSCRIPTION: 'Source primaire (transcription d’édition)',
+  CATALOGUE_DESCRIPTION: 'Notice institutionnelle',
+  CATALOGUE_OBJECT: 'Notice institutionnelle',
+  TRANSLATION_SECONDARY: 'Traduction',
+};
+const byRepo = new Map<string, typeof d.sourcesV04>();
+for (const s of d.sourcesV04) byRepo.set(s.repository, [...(byRepo.get(s.repository) ?? []), s]);
+const support = [
+  ['Library of Congress, Folklife Today — « Christmas Cousins: Father Christmas and Santa Claus » (2018)', 'https://blogs.loc.gov/folklife/2018/12/christmas-cousins-father-christmas-and-santa-claus/'],
+  ['Library of Congress, Folklife Today — « In Comes I, Old Father Christmas » (2018)', 'https://blogs.loc.gov/folklife/2018/12/in-comes-i-old-father-christmas-surprising-history-of-a-christmas-icon/'],
+  ['Library of Congress, Folklife Today — « Krampus: Origins and Development of a Winter Devil » (2025)', 'https://blogs.loc.gov/folklife/2025/12/krampus-origins-and-development-of-a-winter-devil/'],
+  ['Cambridge Edition of the Works of Ben Jonson — essai de chronologie (UVic)', 'https://hcmc.uvic.ca/eol/cambridge/benjonson/essays/chronology_riddle_essay/'],
+  ['KB, Koninklijke Bibliotheek — « Sint Nikolaas en zijn knecht »', 'https://www.kb.nl/ontdekken-bewonderen/topstukken/sint-nikolaas-en-zijn-knecht'],
+  ['DBNL — Schenkman, Sint Nikolaas en zijn knecht (1850)', 'https://www.dbnl.org/titels/titel.php?id=sche039stni01'],
+] as const;
+---
+
+<Base title="Bibliographie" description="Bibliographie de provenance TFIC-PN : sources primaires, notices institutionnelles, traductions et références d’appui, avec leurs liens d’origine." section="bibliographie">
+  <p class="eyebrow">Provenance</p>
+  <h1>Bibliographie</h1>
+  <p class="lede">
+    Chaque référence renvoie à l’institution qui la conserve. On distingue la source primaire consultée (et sous quelle forme),
+    la notice de catalogue, la traduction et la référence d’appui interprétative.
+  </p>
+
+  <h2>Témoins ciblés (v0.5)</h2>
+  <ol>
+    {d.sourcesV05.map((s) => (
+      <li>
+        {s.creator}, <cite>{s.title}</cite>, {s.dateLabel}. {s.witness}.
+        <span class="badge">{KIND[s.evidenceGrade] ?? gradeLabel(s.evidenceGrade)}</span>
+        <br /><a href={s.url} rel="noopener external">{s.url}</a> · <a href={href(`corpus/${s.id}`)}>fiche {s.id}</a>
+      </li>
+    ))}
+  </ol>
+
+  <h2>Références d’appui</h2>
+  <p class="small muted">Ce sont des interprétations institutionnelles. Elles éclairent les sources sans les remplacer.</p>
+  <ul>{support.map(([t, u]) => <li>{t}<br /><a href={u} rel="noopener external">{u}</a></li>)}</ul>
+
+  <h2>Registre de couverture large (v0.4), par institution</h2>
+  {[...byRepo.entries()].sort((a, b) => b[1].length - a[1].length).map(([repo, list]) => (
+    <details>
+      <summary><strong>{repo}</strong> — {list.length} notice(s)</summary>
+      <ul>{list.map((s) => <li><a href={href(`corpus/${s.id}`)}><code>{s.id}</code></a> {s.title} ({s.dateLabel}) — <a href={s.url} rel="noopener external">notice</a></li>)}</ul>
+    </details>
+  ))}
+  <p class="small muted">
+    La source d’entreprise (Coca-Cola) est une source intéressée. Elle sert seulement à établir que la marque reconnaît elle-même des représentations rouges antérieures à 1931.
+  </p>
+
+  <h2>Droits</h2>
+  <p>
+    Les textes et images cités restent sous les droits de leurs détenteurs. Les données dérivées de ce site (codages, relations, vocabulaire) sont
+    publiées sous CC BY-SA 4.0. Aucune reproduction d’archive n’est hébergée ici.
+  </p>
+</Base>

@@ -1,39 +1,103 @@
 # Un worker : du travail de fond, aucune surface HTTP. Donc pas de labels
 # Traefik, pas de reseau edge, et 'exposure: none' dans app.yaml -- appctl
 # refuse l'un sans l'autre.
+#
+# Le worker est le VALIDATEUR du site TFIC-PN : a chaque cycle il rejoue les
+# controles scientifiques (vocabulaire, relations, interdictions d'inference),
+# reconstruit le site statique et journalise PASS/FAIL. Le site lui-meme est
+# publie par GitHub Actions sur GitHub Pages, pas par ce conteneur.
 services:
   worker:
     build:
-      context: ./src
+      context: .
+      dockerfile: src/Dockerfile
     restart: unless-stopped
     networks:
       - internal
     environment:
       APP_NAME: tfic
       TZ: Europe/Paris
-      WORKER_INTERVAL: "30"
+      WORKER_INTERVAL: "900"
     volumes:
       - state:/state
     deploy:
       resources:
         limits:
           cpus: "1.0"
-          memory: 256M
-          pids: 128
+          memory: 768M
+          pids: 256
     healthcheck:
       # Le worker touche /tmp/heartbeat a chaque tour : le conteneur est sain
-      # tant que ce fichier est recent. Le seuil doit rester superieur a deux
-      # fois WORKER_INTERVAL. 'Sain' veut dire "la boucle tourne", pas "le
-      # travail reussit" -- ca, ce sont les logs qui le disent.
+      # tant que ce fichier est recent. Le seuil (2000 s) doit rester superieur
+      # a deux fois WORKER_INTERVAL (900 s). 'Sain' veut dire "la boucle
+      # tourne", pas "le travail reussit" -- ca, ce sont les logs qui le disent.
       # Les '$$' sont des '$' : Docker Compose interprete un '$' seul.
-      test: ["CMD", "sh", "-c", "[ $$(( $$(date +%s) - $$(stat -c %Y /tmp/heartbeat) )) -lt 180 ]"]
+      test: ["CMD", "sh", "-c", "[ $$(( $$(date +%s) - $$(stat -c %Y /tmp/heartbeat) )) -lt 2000 ]"]
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
-    # 'docker stop' laisse 10 s avant le SIGKILL. Le worker s'arrete a la fin du
-    # cycle en cours : si un cycle peut durer plus longtemps, augmenter ici.
-    stop_grace_period: 30s
+      start_period: 300s
+    # Un cycle (validation + build Astro) dure de l'ordre de la minute ; le
+    # worker finit le cycle en cours sur SIGTERM, d'ou une marge large.
+    stop_grace_period: 180s
+
+  # Outil de developpement, jamais demarre par 'up' : conteneur jetable lance
+  # par 'sudo appctl run dev <commande>'. Monte ./site pour que npm (install,
+  # test, build) tourne dans Docker et non sur l'hote.
+  dev:
+    profiles: ["cli"]
+    image: node:22-alpine
+    user: "1029:1030"
+    working_dir: /site
+    environment:
+      HOME: /tmp
+      ASTRO_TELEMETRY_DISABLED: "1"
+      CI: "1"
+    volumes:
+      - ./site:/site
+      - ./specs/TFIC_Pere_Noel:/specs:ro
+    entrypoint: ["sh", "-c", "exec \"$$@\"", "--"]
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+          pids: 512
+
+  # Outil jetable : verificateur scientifique Python sur specs/ (lecture seule).
+  # 'sudo appctl run verify python3 -I verifier_TFIC_PN_v0.5.1.py'
+  verify:
+    profiles: ["cli"]
+    image: python:3.13-alpine
+    user: "1029:1030"
+    working_dir: /specs
+    volumes:
+      - ./specs/TFIC_Pere_Noel:/specs:ro
+    network_mode: none
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
+          pids: 32
+
+  # Outil jetable : captures d'ecran du site construit (Playwright), servies
+  # en local dans le conteneur. 'sudo appctl run shot node /site/scripts/screenshots.mjs'
+  shot:
+    profiles: ["cli"]
+    image: mcr.microsoft.com/playwright:v1.65.1-noble
+    user: "1029:1030"
+    working_dir: /site
+    environment:
+      HOME: /tmp
+    volumes:
+      - ./site:/site
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+          pids: 512
 
 networks:
   internal:

@@ -1,0 +1,46 @@
+---
+import Base from '../../layouts/Base.astro';
+import { exportFiles } from '../../lib/exports.ts';
+import { href } from '../../lib/url.ts';
+import { SCIENCE_VERSION } from '../../lib/version.ts';
+
+const files = exportFiles();
+---
+
+<Base title="Téléchargements" description="Données publiées de TFIC-PN (CSV d’origine et JSON normalisé) avec empreintes SHA-256. Gabarits participants et manifeste de stimuli exclus." section="telechargements">
+  <p class="eyebrow">Données publiées</p>
+  <h1>Téléchargements</h1>
+  <p class="lede">
+    Ne sont publiés que les fichiers <strong>sélectionnés</strong> pour la diffusion. Les documents de travail internes, les gabarits de
+    réponses de participants et le manifeste des stimuli (qui contient les étiquettes cibles) en sont exclus.
+  </p>
+
+  <h2>Jeu normalisé</h2>
+  <p>
+    <a href={href(`telechargements/tfic-pn-donnees-v${SCIENCE_VERSION}.json`)}>tfic-pn-donnees-v{SCIENCE_VERSION}.json</a> : les deux corpus,
+    adaptés au même schéma mais <em>non fusionnés</em>, avec leurs corrections en surcouche et les empreintes des fichiers sources.
+  </p>
+
+  <h2>Fichiers CSV</h2>
+  <div class="table-wrap">
+    <table>
+      <caption>Fichiers CSV publiés (UTF-8)</caption>
+      <thead><tr><th scope="col">Fichier</th><th scope="col">Contenu</th><th scope="col" class="num">Octets</th><th scope="col">SHA-256</th></tr></thead>
+      <tbody>
+        {files.map((f) => (
+          <tr>
+            <th scope="row"><a href={href(`telechargements/csv/${f.name}`)}>{f.name}</a></th>
+            <td>{f.description}</td>
+            <td class="num">{f.bytes.toLocaleString('fr-FR')}</td>
+            <td><code class="small" style="word-break:break-all">{f.sha256}</code></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p class="small muted">
+    Les fichiers v0.4 sont publiés tels quels, octet pour octet. Leur colonne <code>state</code> contient encore les valeurs « 1 » et « 8 »,
+    que le site normalise en surcouche (corrections K10 à K14).
+  </p>
+  <p class="small">Licence : CC BY-SA 4.0 pour les données dérivées. Les sources citées restent sous les droits de leurs institutions.</p>
+</Base>

@@ -1,0 +1,136 @@
+---
+import Base from '../layouts/Base.astro';
+import Regime from '../components/Regime.astro';
+import { dataset } from '../lib/data.ts';
+import { STATE_LABEL } from '../lib/labels.ts';
+import { STATES } from '../lib/model.ts';
+
+const d = dataset();
+const audit = [
+  ['C1', 'Ben Jonson, Christmas his Masque', 'Ne plus retenir 1610 : le témoin Folger J.a.1 est daté 1615, et la représentation probable se situe en 1616–1617 (jour incertain).'],
+  ['C2', 'Karl Krinken', 'Le texte consulté est l’édition 1878. La préface datée 1853 ne date pas les scènes, et l’édition 1864 citée par la LOC n’a pas été collationnée.'],
+  ['C3', 'Old Santeclaus (1821)', 'Auteur non assuré : « anonyme / attribution contestée ».'],
+  ['C4', 'A Visit from St. Nicholas (1823)', 'La version consultée est une recension moderne, pas le Troy Sentinel du 23 décembre 1823. Attribution à Moore contestée. Aucun manteau rouge décrit.'],
+  ['C5', 'George Sand (1855)', 'Souvenir rétrospectif publié en 1855, pas une observation de 1855.'],
+  ['C6', 'Schenkman (1850)', 'Notice institutionnelle de la KB, pas un dépouillement planche par planche. Le serviteur racialisé est à contextualiser.'],
+  ['C7', 'Puck 1904 et 1912', 'Ces images réfutent des universelles sur les images (« toujours en traîneau », « jamais armé »), pas sur les rites familiaux.'],
+  ['C8', 'Nicolas et Krampus (1897)', 'Consulté en traduction LOC (2025). Ne permet pas d’établir une généalogie démoniaque antérieure.'],
+] as const;
+const falsif = [
+  ['F1', 'Essentialisme iconographique', 'Si le Santa en automobile de 1904 n’est jamais identifié sans titre, cela fragilise la robustesse de la reconnaissance. La continuité documentaire, elle, n’est pas réfutée.'],
+  ['F2', 'Supériorité narrative', 'Si M1 n’améliore pas M0 hors échantillon, avec un intervalle concluant pour la marge fixée, H6 est affaiblie.'],
+  ['F3', 'Culture', 'Si la variable culturelle n’explique aucune variation hors échantillon, la contextualité forte est affaiblie pour la population étudiée.'],
+  ['F4', 'Confusion de compagnon', 'Si le système classe systématiquement Rudolph ou Krampus comme le Père Noël, la taxonomie échoue.'],
+  ['F5', 'Filiation', 'Si un estimateur crée des filiations à partir des seuls motifs partagés, le test de traçabilité échoue.'],
+  ['F6', 'Datation', 'Toute assertion qui utilise la préface de 1853 pour dater un passage de l’édition 1878 sans collation échoue.'],
+] as const;
+---
+
+<Base title="Méthodologie" description="Codebook, statuts des assertions, double annotation prévue, protocole adulte non exécuté, réfutations F1–F6, hypothèses, corrections et ce que nous ne savons pas." section="methodologie">
+  <p class="eyebrow">Codebook · protocole · limites</p>
+  <h1>Méthodologie</h1>
+  <p class="lede">Comment une proposition entre dans le corpus, ce qu’il faudrait pour tester les modèles, et ce qui reste inconnu.</p>
+
+  <h2>Forme minimale d’une conclusion</h2>
+  <p>
+    Toute inférence historique doit porter : un énoncé, l’identifiant de la source, l’édition ou le témoin consulté, un localisateur
+    (vers, page, folio, région de l’image), un niveau d’accès, les contradictions connues, une portée et une note de confiance.
+  </p>
+
+  <h2>États d’une assertion</h2>
+  <dl class="meta">
+    {STATES.map((s) => <><dt><code>{s}</code></dt><dd>{STATE_LABEL[s]}. {d.vocabulary.find((v) => v.domain === 'state' && v.code === s)?.definition}</dd></>)}
+  </dl>
+  <p>Un manteau rouge « indéterminé » signifie que la source ne permet pas de fixer la couleur. Cela ne veut jamais dire que le costume n’était pas rouge.</p>
+
+  <h2>Annotation</h2>
+  <p>
+    <strong>État actuel :</strong> les 46 assertions v0.5 sont une pré-annotation d’<em>une seule passe éditoriale</em> (<code>PILOT_EDITOR</code>).
+    Aucun second codeur indépendant n’est intervenu, et aucun accord inter-annotateurs (alpha de Krippendorff, ICC) n’est calculable.
+  </p>
+  <p>
+    <strong>Procédure prévue :</strong> deux évaluateurs compétents dans la langue source codent les mêmes témoins sans se consulter. Un arbitre peut
+    produire une table consensuelle sans effacer les deux tables originales. Les divergences dues aux éditions sont des problèmes de témoins, pas des erreurs humaines.
+  </p>
+  <div class="callout">
+    <p>
+      <strong>Point critique (revue v0.5.1).</strong> Pour les notices de catalogue, deux codeurs qui lisent le même résumé institutionnel ne sont
+      pas indépendants de ce résumé. Un accord élevé y mesurerait la clarté du catalogue, pas la fiabilité du codage de l’objet. Il faut coder
+      les images ou les pages elles-mêmes.
+    </p>
+  </div>
+
+  <h2>Protocole de reconnaissance (préparé, non exécuté)</h2>
+  <p><Regime kind="experience" /> <strong>Aucun participant, aucune réponse, aucune métrique.</strong></p>
+  <ul>
+    <li>Pré-test réservé à des adultes volontaires, avec consentement. Aucun mineur sans procédure éthique dédiée.</li>
+    <li>Masquage des titres, signatures, légendes et URL. Les auteurs, années et genres sont masqués dans les conditions M0 et M1.</li>
+    <li>Ordre randomisé par participant, avec seed enregistré. Partitions par famille d’œuvre : les deux passages de <em>Karl Krinken</em> forment un seul groupe.</li>
+    <li>Questions : identification libre, puis liste fermée (avec « autre » et « je ne sais pas »), confiance de 0 à 100, familiarité (posée après les stimuli), co-identification de paires.</li>
+    <li>Ne jamais exclure un participant au motif qu’il reconnaît mal une figure.</li>
+  </ul>
+  <p class="small muted">
+    Le manifeste des 12 stimuli candidats n’est <strong>pas publié</strong> ici. Il contient les étiquettes cibles de développement, et sa
+    diffusion compromettrait une future passation en aveugle. Le même risque vaut d’ailleurs pour le corpus public : des participants
+    recrutés pourraient avoir lu ce site. Il faudra le contrôler, par exemple avec une question post-test.
+  </p>
+
+  <h2>Réfutations structurées F1–F6</h2>
+  <div class="table-wrap">
+    <table>
+      <caption>Conditions de réfutation (plan statistique v0.5)</caption>
+      <thead><tr><th scope="col">Code</th><th scope="col">Cible</th><th scope="col">Condition</th><th scope="col">État</th></tr></thead>
+      <tbody>{falsif.map(([c, t, x]) => <tr><th scope="row">{c}</th><td>{t}</td><td>{x}</td><td>pas testé</td></tr>)}</tbody>
+    </table>
+  </div>
+  <p class="small muted">F5 et F6 sont des contrôles de procédure (le pipeline respecte-t-il ses règles ?) plutôt que des tests d’hypothèses sur le monde.</p>
+
+  <h2>Hypothèses</h2>
+  <div class="table-wrap">
+    <table>
+      <caption>Hypothèses H1–H6 et état des tests</caption>
+      <thead><tr><th scope="col">Code</th><th scope="col">Énoncé</th><th scope="col">État</th></tr></thead>
+      <tbody>
+        {['H1', 'H2', 'H3', 'H4', 'H5'].map((h) => <tr><th scope="row">{h}</th><td class="muted">Non définie dans les documents de travail fournis (v0.3–v0.5). Elle n’est pas reconstituée ici pour ne pas inventer d’hypothèse.</td><td>—</td></tr>)}
+        <tr><th scope="row">H6</th><td>Les informations narratives et fonctionnelles améliorent la prédiction de la reconnaissance humaine par rapport à la seule apparence (M1 contre M0).</td><td>pas testé</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Ce que nous ne savons pas</h2>
+  <ul>
+    <li>Si les fonctions narratives améliorent la reconnaissance : <strong>non testé</strong>.</li>
+    <li>À quelle fréquence historique un trait est présent : le corpus de contre-exemples choisis ne le permet pas.</li>
+    <li>Comment les reconnaissaient les contemporains : des adultes de 2026 ne renseignent pas sur la reconnaissance en 1850 ou en 1900. Une étude actuelle mesure une catégorisation <em>actuelle</em>.</li>
+    <li>Quelle est la part d’ascendance de saint Nicolas, Odin ou Coca-Cola : ces pourcentages ne sont pas identifiables (décomposition non unique).</li>
+    <li>Quel est l’effet causal de la campagne Coca-Cola de 1931 : faute de contrefactuel, il est inconnu. Des représentations rouges lui sont antérieures.</li>
+    <li>Si les scènes de <em>Karl Krinken</em> figuraient déjà en 1853 ou en 1864 : la collation n’a pas été faite.</li>
+    <li>Qui a écrit <em>Old Santeclaus</em> (1821) et <em>A Visit from St. Nicholas</em> (1823) : les attributions sont contestées.</li>
+  </ul>
+
+  <h2>Registre des corrections</h2>
+  <h3>Audit des témoins primaires (v0.5)</h3>
+  <div class="table-wrap">
+    <table>
+      <caption>Rectifications C1–C8</caption>
+      <thead><tr><th scope="col">Code</th><th scope="col">Objet</th><th scope="col">Correction</th></tr></thead>
+      <tbody>{audit.map(([c, o, x]) => <tr><th scope="row">{c}</th><td>{o}</td><td>{x}</td></tr>)}</tbody>
+    </table>
+  </div>
+  <h3>Revue critique (v0.5.1)</h3>
+  <div class="table-wrap">
+    <table>
+      <caption>Corrections K01–K15 (fichiers d’origine conservés)</caption>
+      <thead><tr><th scope="col">Code</th><th scope="col">Fichier</th><th scope="col">Enregistrement</th><th scope="col">Champ</th><th scope="col">Avant</th><th scope="col">Après</th><th scope="col">Motif</th></tr></thead>
+      <tbody>{d.corrections.map((k) => <tr><th scope="row">{k.id}</th><td>{k.file}</td><td><code>{k.recordId}</code></td><td>{k.field}</td><td>{k.before}</td><td>{k.after}</td><td>{k.reason}</td></tr>)}</tbody>
+    </table>
+  </div>
+  <p class="small muted">Rudolph est daté 1939, date de création du livret promotionnel (S11). Il n’entre pas dans les corrections.</p>
+
+  <h2>Droits iconographiques</h2>
+  <p>
+    Le site ne réhéberge aucune reproduction d’archive : chaque source renvoie à son institution. Les couvertures de <em>Puck</em> (1904, 1912) et la gravure
+    de Nast (1863) sont des publications américaines antérieures à 1929, donc très probablement dans le domaine public aux États-Unis. Cette
+    hypothèse reste à confirmer notice par notice avant toute réutilisation. Le livret <em>Rudolph</em> (1939) est présumé sous droits.
+  </p>
+</Base>

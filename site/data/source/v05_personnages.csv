@@ -1,0 +1,10 @@
+character_id,label_fr,kind,note
+C_NICHOLAS,Saint Nicolas,individual,"Évêque de Myre; figure hagiographique et rituelle"
+C_SINTERKLAAS,Sinterklaas,individual,"Forme néerlandaise; visite du 5/6 décembre"
+C_SANTA_CLAUS,Santa Claus,individual,"Figure américaine du XIXe siècle"
+C_FATHER_CHRISTMAS,Father Christmas,individual,"Personnification anglaise de Noël"
+C_PERE_NOEL,Père Noël,individual,"Usage français; dans ce corpus, un seul témoin (Sand 1855)"
+C_KNECHT,Serviteur de Sinterklaas,auxiliary,"Anonyme dans Schenkman 1850; nom ultérieur non attesté ici; servitude racialisée à contextualiser"
+C_KRAMPUS,Krampus,type,"Type pluralisable; compagnon punitif de Nicolas"
+C_PERE_FOUETTARD,Père Fouettard,auxiliary,"Aucun témoin dans le corpus v0.4/v0.5"
+C_RUDOLPH,Rudolph,individual,"Renne créé en 1939; personnage associé, jamais Santa"

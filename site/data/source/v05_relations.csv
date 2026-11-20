@@ -1,0 +1,8 @@
+relation_id,subject,object,relation,evidence_source_ids,locator,status,note,correction_note
+X01,O07_SANTA,O07_FC,distinct_roles_in_witness,S07,1878 édition pp. 1–3 vs 243–249,SUPPORTED,Not an inference of 1853/1864 scene identity,
+X02,O10_NICH,O10_KRAM,accompanied_by,S10,1897 memoir in modern translation,SUPPORTED_TRANSLATION,Independent personae; original not checked,
+X03,O04_SINT,O04_SERVANT,accompanied_by,S04,KB 1850 commentary,SUPPORTED_CATALOGUE,Servant unnamed in original according to KB,
+X04,C_RUDOLPH,C_SANTA_CLAUS,same_character,S11,Smithsonian catalogue record,REJECTED,"Negative control at character level: Rudolph is a reindeer created 1939, associated with Santa, never Santa","objet O03_SANTA (1823) -> C_SANTA_CLAUS ; relation same_person -> same_character ; anachronisme supprimé"
+X05,O01_FC,O07_FC,historical_direct_descent,S01;S07,no attested sequence supplied,UNKNOWN,Similarity/name not enough,
+X06,O02_SANTA,O03_SANTA,documented_derivation,S02;S03,no explicit copy attestation supplied,UNKNOWN,Similar motifs do not document copy,
+X07,O06_NAST,O08_AUTO,shared_catalogue_label,S06;S08,both LOC records title the figure Santa Claus,SUPPORTED_CATALOGUE,"Shared institutional label only: not a copying edge, not a recognition target",relation same_named_character_family -> shared_catalogue_label (évite la fuite d'étiquette)

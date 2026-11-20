@@ -1,0 +1,70 @@
+---
+import Base from '../../layouts/Base.astro';
+import Regime from '../../components/Regime.astro';
+import { dataset } from '../../lib/data.ts';
+import { CHARACTER_TEXT } from '../../lib/characters-text.ts';
+import type { Character } from '../../lib/model.ts';
+import { RELATION_LABEL, edgeEvidence } from '../../lib/semantics.ts';
+import { href } from '../../lib/url.ts';
+
+export function getStaticPaths() {
+  return dataset().characters.map((c) => ({ params: { slug: c.slug }, props: { character: c } }));
+}
+interface Props {
+  character: Character;
+}
+const { character: c } = Astro.props;
+const d = dataset();
+const text = CHARACTER_TEXT[c.id];
+const occ = d.occurrences.filter((o) => o.characterId === c.id);
+const occIds = new Set(occ.map((o) => o.id));
+const src = new Map(d.sourcesV05.map((s) => [s.id, s]));
+const v04 = d.sourcesV04.filter((s) => s.characterIds.includes(c.id));
+const rels = d.relationsV05.filter((r) => occIds.has(r.subject) || occIds.has(r.object) || r.subject === c.id || r.object === c.id);
+const KIND = { individual: 'personnage individuel', type: 'type de figure (pluralisable)', auxiliary: 'auxiliaire', family: 'famille culturelle' } as const;
+const EVID = { attested: 'attestée', hypothesis: 'non documentée', rejected: 'rejetée (contrôle négatif)' } as const;
+---
+
+<Base title={c.label} description={`Fiche ${c.label} : occurrences sourcées, relations typées et limites. ${text?.summary ?? ''}`.slice(0, 300)} section="personnages">
+  <p class="eyebrow"><a href={href('personnages')}>Personnages</a> · {KIND[c.kind]}</p>
+  <h1>{c.label}</h1>
+  <p class="lede">{text?.summary}</p>
+
+  {text && text.distinctions.length > 0 && (
+    <>
+      <h2>Distinctions</h2>
+      <ul>{text.distinctions.map((t) => <li>{t}</li>)}</ul>
+    </>
+  )}
+  {text && <div class="callout"><p><strong>Limites.</strong> {text.limits}</p></div>}
+
+  <h2>Occurrences dans les témoins v0.5</h2>
+  {occ.length === 0 ? <p class="muted">Aucune.</p> : (
+    <ul>
+      {occ.map((o) => {
+        const s = src.get(o.sourceId);
+        return <li><Regime kind="fait" /> <code>{o.id}</code> — « {o.designation} » dans <a href={href(`corpus/${o.sourceId}`)}>{s?.title}</a> ({s?.dateLabel}){o.note && <span class="small muted"> — {o.note}</span>}</li>;
+      })}
+    </ul>
+  )}
+
+  <h2>Relations typées</h2>
+  {rels.length === 0 ? <p class="muted">Aucune relation déclarée.</p> : (
+    <ul>
+      {rels.map((r) => (
+        <li>
+          {edgeEvidence(r) === 'attested' ? <Regime kind="fait" /> : <Regime kind="hypothese" />}{' '}
+          <code>{r.subject}</code> — {RELATION_LABEL[r.relation] ?? r.relation} — <code>{r.object}</code> : {EVID[edgeEvidence(r)]} (<code>{r.status}</code>). <span class="muted">{r.note}</span>
+        </li>
+      ))}
+    </ul>
+  )}
+
+  <h2>Notices du registre v0.4</h2>
+  {v04.length === 0 ? <p class="muted">Aucune.</p> : (
+    <>
+      <p class="small muted">Rattachement selon la catégorie de catalogue du registre, corrigée en surcouche quand c’est nécessaire.</p>
+      <ul>{v04.map((s) => <li><a href={href(`corpus/${s.id}`)}><code>{s.id}</code></a> {s.title} ({s.dateLabel})</li>)}</ul>
+    </>
+  )}
+</Base>

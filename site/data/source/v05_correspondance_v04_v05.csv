@@ -1,0 +1,12 @@
+v05_source_id,v04_id,link,note
+S01,D005,same_work_different_witness,"v0.4 date 1610 (LOC); v0.5 témoin Folger daté 1615, représentation 1616–1617 probable"
+S02,D017,same_work_same_edition,"Édition 1821; nombre de rennes v0.4 (1) remplacé par UNKNOWN v0.5"
+S03,D018,same_work_different_witness,"v0.4 vise le Troy Sentinel 1823; v0.5 consulte une recension moderne"
+S04,D014,same_work_same_edition,"1re édition 1850"
+S05,D019,same_work_same_edition,"v0.4 classe la figure 'Santa' : le témoin dit 'père Noël' (C_PERE_NOEL)"
+S06,D020,same_work_same_edition,"Harper's Weekly, 3 janvier 1863"
+S07,D023,same_work_different_witness,"v0.4 date 1864 via LOC; v0.5 consulte l'édition 1878 (préface datée 1853)"
+S08,D039,same_work_same_edition,"Puck, 7 décembre 1904"
+S09,D044,same_work_same_edition,"Puck, 11 décembre 1912"
+S10,D048,same_work_different_witness,"v0.5 : traduction anglaise LOC 2025 du récit de 1897"
+S11,D047,same_work_same_edition,"Livret 1939; URL v0.4 divergente (/ne/collections/)"

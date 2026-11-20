@@ -1,0 +1,8 @@
+.git
+.claude
+specs
+**/node_modules
+site/dist
+site/.astro
+*.log
+.env

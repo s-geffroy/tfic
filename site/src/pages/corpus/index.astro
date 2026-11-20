@@ -1,0 +1,116 @@
+---
+import Base from '../../layouts/Base.astro';
+import { dataset } from '../../lib/data.ts';
+import { gradeLabel, mediumLabel } from '../../lib/labels.ts';
+import type { SourceEntry } from '../../lib/model.ts';
+import { href } from '../../lib/url.ts';
+
+const d = dataset();
+const charLabel = new Map(d.characters.map((c) => [c.id, c.label]));
+const all = [...d.sourcesV05, ...d.sourcesV04];
+const uniq = (xs: string[]) => [...new Set(xs.filter(Boolean))].sort((a, b) => a.localeCompare(b, 'fr'));
+const areas = uniq(all.map((s) => s.area));
+const media = uniq(all.map((s) => s.medium));
+const grades = uniq(all.map((s) => s.evidenceGrade));
+const families = uniq(all.map((s) => s.workFamily));
+const chars = d.characters.filter((c) => all.some((s) => s.characterIds.includes(c.id)));
+const assertionsBy = new Map<string, number>();
+for (const a of [...d.assertionsV05, ...d.assertionsV04]) assertionsBy.set(a.sourceId, (assertionsBy.get(a.sourceId) ?? 0) + 1);
+
+const rowAttrs = (s: SourceEntry) => ({
+  'data-row': '',
+  'data-start': s.startYear ?? '',
+  'data-end': s.endYear ?? '',
+  'data-area': s.area,
+  'data-medium': s.medium,
+  'data-grade': s.evidenceGrade,
+  'data-family': s.workFamily,
+  'data-chars': s.characterIds.join(' '),
+  'data-text': `${s.id} ${s.title} ${s.creator} ${s.witness} ${s.limitations}`.toLowerCase(),
+});
+const charsOf = (s: SourceEntry) => s.characterIds.map((c) => charLabel.get(c) ?? c).join(', ');
+---
+
+<Base title="Corpus" description="Catalogue versionné des témoins TFIC-PN : 11 témoins ciblés (v0.5) et 51 notices de couverture large (v0.4), avec datation, niveau de preuve et limites." section="corpus">
+  <p class="eyebrow">Catalogue versionné</p>
+  <h1>Corpus</h1>
+  <p class="lede">
+    Deux corpus <strong>distincts</strong> qui se recouvrent : 11 témoins ciblés et dépouillés (v0.5) et 51 notices de couverture
+    large (v0.4). Ils ne s’additionnent pas. Seuls {d.crosswalk.length} appariements explicites, déclarés œuvre par œuvre, les relient.
+  </p>
+  <p class="small muted">
+    Le corpus est un échantillon de commodité, orienté vers les documents conservés, numérisés et choisis pour leur valeur de contre-exemple.
+    Il ne mesure aucune fréquence historique.
+  </p>
+
+  <form class="filters" id="filters" aria-describedby="filters-help" role="search">
+    <p id="filters-help" class="small muted" style="flex-basis:100%;margin:0">Les filtres s’appliquent aux deux tables. Sans JavaScript, toutes les lignes restent visibles.</p>
+    <label>Recherche<input type="search" name="q" placeholder="titre, auteur, témoin…" /></label>
+    <label>Depuis<input type="number" name="from" inputmode="numeric" min="1000" max="2100" placeholder="1200" style="width:6.5rem" /></label>
+    <label>Jusqu’à<input type="number" name="to" inputmode="numeric" min="1000" max="2100" placeholder="1950" style="width:6.5rem" /></label>
+    <label>Personnage<select name="char"><option value="">tous</option>{chars.map((c) => <option value={c.id}>{c.label}</option>)}</select></label>
+    <label>Zone<select name="area"><option value="">toutes</option>{areas.map((a) => <option value={a}>{a}</option>)}</select></label>
+    <label>Support<select name="medium"><option value="">tous</option>{media.map((m) => <option value={m}>{mediumLabel(m)}</option>)}</select></label>
+    <label>Niveau de preuve<select name="grade"><option value="">tous</option>{grades.map((g) => <option value={g}>{gradeLabel(g)}</option>)}</select></label>
+    <label>Famille d’œuvre<select name="family"><option value="">toutes</option>{families.map((f) => <option value={f}>{f}</option>)}</select></label>
+    <button type="reset">Réinitialiser</button>
+  </form>
+  <p id="count" aria-live="polite" class="small"></p>
+
+  <h2 id="v05">Témoins ciblés — v0.5</h2>
+  <div class="table-wrap">
+    <table data-table="v05">
+      <caption>Témoins dépouillés : édition consultée, niveau d’accès, état du dépouillement</caption>
+      <thead>
+        <tr><th scope="col">ID</th><th scope="col">Titre</th><th scope="col">Témoin / édition</th><th scope="col">Date</th><th scope="col">Personnages</th><th scope="col">Support</th><th scope="col">Niveau de preuve</th><th scope="col" class="num">Assertions</th></tr>
+      </thead>
+      <tbody>
+        {d.sourcesV05.map((s) => (
+          <tr {...rowAttrs(s)}>
+            <th scope="row"><a href={href(`corpus/${s.id}`)}>{s.id}</a></th>
+            <td>{s.title}<br /><span class="muted small">{s.creator}</span></td>
+            <td>{s.witness}</td>
+            <td>{s.dateLabel}</td>
+            <td>{charsOf(s)}</td>
+            <td>{mediumLabel(s.medium)}</td>
+            <td>{gradeLabel(s.evidenceGrade)}</td>
+            <td class="num">{assertionsBy.get(s.id) ?? 0}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p class="empty small" data-empty="v05" hidden>Aucun témoin v0.5 ne correspond à ces filtres.</p>
+
+  <h2 id="v04">Registre de couverture large — v0.4</h2>
+  <p class="small muted">Les catégories de personnage sont celles des titres de catalogue. Ce sont des référents documentaires, pas des réponses humaines.</p>
+  <div class="table-wrap">
+    <table data-table="v04">
+      <caption>Notices du registre v0.4 (dates du registre ; corrections v0.5.1 signalées)</caption>
+      <thead>
+        <tr><th scope="col">ID</th><th scope="col">Titre</th><th scope="col">Date</th><th scope="col">Personnages</th><th scope="col">Zone</th><th scope="col">Support</th><th scope="col">Niveau de preuve</th><th scope="col">Dépôt</th><th scope="col" class="num">Assertions</th></tr>
+      </thead>
+      <tbody>
+        {d.sourcesV04.map((s) => (
+          <tr {...rowAttrs(s)}>
+            <th scope="row"><a href={href(`corpus/${s.id}`)}>{s.id}</a></th>
+            <td>{s.title}{s.corrections.length > 0 && <><br /><span class="badge" title="Correction en surcouche">corrigé v0.5.1</span></>}</td>
+            <td>{s.dateLabel}</td>
+            <td>{charsOf(s)}</td>
+            <td>{s.area}</td>
+            <td>{mediumLabel(s.medium)}</td>
+            <td>{gradeLabel(s.evidenceGrade)}</td>
+            <td>{s.repository}</td>
+            <td class="num">{assertionsBy.get(s.id) ?? 0}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p class="empty small" data-empty="v04" hidden>Aucune notice v0.4 ne correspond à ces filtres.</p>
+</Base>
+
+<script>
+  import { filterCorpus } from '../../scripts/corpus-filter.ts';
+  filterCorpus();
+</script>
