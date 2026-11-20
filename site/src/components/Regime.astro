@@ -1,13 +1,13 @@
 ---
-/** Les quatre régimes de contenu de la spec : visuellement et sémantiquement distincts. */
+/** Les quatre régimes de contenu : forme + mot + couleur, en italique de marge. */
 interface Props {
   kind: 'fait' | 'hypothese' | 'demo' | 'experience';
 }
 const LABEL = {
-  fait: 'Fait attesté',
-  hypothese: 'Hypothèse / interprétation',
-  demo: 'Démonstration mathématique',
-  experience: 'Résultat expérimental',
+  fait: 'fait attesté',
+  hypothese: 'hypothèse',
+  demo: 'démonstration',
+  experience: 'résultat expérimental',
 } as const;
 const { kind } = Astro.props;
 ---

@@ -15,16 +15,15 @@ const layouts = levels.map((l) => ({ ...l, layout: layoutGraph(l.graph) }));
 const cats = Object.keys(CATEGORY_LABEL) as EdgeCategory[];
 const EVID = { attested: 'attestée', hypothesis: 'non documentée (hypothèse)', rejected: 'rejetée (contrôle négatif)' } as const;
 const color: Record<EdgeCategory, string> = {
-  distinction: 'var(--fir)',
-  association: 'var(--link)',
-  filiation_hypothetique: 'var(--ochre)',
-  etiquette_catalogue: 'var(--violet)',
-  identite_rejetee: 'var(--brick)',
+  distinction: 'var(--encre)',
+  association: 'var(--encre)',
+  filiation_hypothetique: 'var(--ocre)',
+  etiquette_catalogue: 'var(--encre-2)',
+  identite_rejetee: 'var(--garance)',
 };
 ---
 
 <Base title="Réseau" description="Graphe typé et temporel des relations documentées entre occurrences et personnages. Seules les arêtes attestées sont affichées par défaut ; tableau équivalent." section="reseau">
-  <p class="eyebrow">Graphe typé et temporel</p>
   <h1>Réseau</h1>
   <p class="lede">
     Chaque arête vient d’une relation <strong>déclarée et sourcée</strong>. Aucune n’est créée parce que deux figures partagent des motifs.
@@ -84,7 +83,7 @@ const color: Record<EdgeCategory, string> = {
     </section>
   ))}
 
-  <aside id="edge-panel" class="callout info" aria-live="polite" hidden>
+  <aside id="edge-panel" class="note info" aria-live="polite" hidden>
     <p class="small muted" style="margin:0">Sélectionnez une arête pour afficher ses preuves.</p>
   </aside>
 
@@ -120,15 +119,15 @@ const color: Record<EdgeCategory, string> = {
 <style>
   .legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; margin: 1rem 0; }
   .legend-item { display: inline-flex; align-items: center; gap: 0.4rem; }
-  .svg-wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--rule); border-radius: 6px; }
-  .net-svg { min-width: 760px; width: 100%; height: auto; display: block; font-family: var(--sans); }
-  .net-svg :global(.tick line) { stroke: var(--rule); stroke-width: 1; }
-  .net-svg :global(.tick text), .net-svg :global(.lane text) { fill: var(--muted); font-size: 11px; }
-  .net-svg :global(.lane line) { stroke: var(--rule); stroke-dasharray: 2 4; }
-  .net-svg :global(.node circle), .net-svg :global(.node rect) { fill: var(--card); stroke: var(--ink); stroke-width: 2; }
-  .net-svg :global(.node text) { fill: var(--ink); font-size: 10px; }
+  .svg-wrap { overflow-x: auto; background: var(--feuille); border: 1px solid var(--filet); border-radius: 6px; }
+  .net-svg { min-width: 760px; width: 100%; height: auto; display: block; font-family: var(--ui); }
+  .net-svg :global(.tick line) { stroke: var(--filet); stroke-width: 1; }
+  .net-svg :global(.tick text), .net-svg :global(.lane text) { fill: var(--encre-2); font-size: 11px; }
+  .net-svg :global(.lane line) { stroke: var(--filet); stroke-dasharray: 2 4; }
+  .net-svg :global(.node circle), .net-svg :global(.node rect) { fill: var(--feuille); stroke: var(--encre); stroke-width: 2; }
+  .net-svg :global(.node text) { fill: var(--encre); font-size: 10px; }
   .net-svg :global(.edge) { cursor: pointer; }
-  .net-svg :global(.edge-label) { fill: var(--ink-2); font-size: 10px; font-weight: 600; paint-order: stroke; stroke: var(--card); stroke-width: 3px; }
+  .net-svg :global(.edge-label) { fill: var(--encre-2); font-size: 10px; font-weight: 600; paint-order: stroke; stroke: var(--feuille); stroke-width: 3px; }
   .net-svg :global(.edge:focus-visible path:first-child), .net-svg :global(.edge.selected path:first-child) { stroke-width: 6; }
   .net-svg :global(.edge:focus) { outline: none; }
   .net-svg :global(.edge[data-evidence='hypothesis']), .net-svg :global(.edge[data-evidence='rejected']) { display: none; }

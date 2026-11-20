@@ -32,7 +32,7 @@ const evidenceLabel = { attested: 'attestée', hypothesis: 'non documentée', re
 ---
 
 <Base title={`${s.id} — ${s.title}`} description={`Fiche ${s.corpus} : ${s.title} (${s.dateLabel}). Témoin, niveau de preuve, limites et assertions sourcées.`} section="corpus">
-  <p class="eyebrow"><a href={href('corpus')}>Corpus</a> · {s.corpus === 'v0.5' ? 'témoin ciblé v0.5' : 'notice du registre v0.4'}</p>
+  <p class="ariane"><a href={href('corpus')}>Corpus</a> › {s.corpus === 'v0.5' ? 'témoin ciblé (v0.5)' : 'registre large (v0.4)'} › <span class="cote">{s.id}</span></p>
   <h1>{s.title}</h1>
   <p><Regime kind="fait" /> <span class="small muted">au niveau de preuve indiqué ci-dessous, et seulement à ce niveau</span></p>
 
@@ -55,10 +55,10 @@ const evidenceLabel = { attested: 'attestée', hypothesis: 'non documentée', re
     </dd>
   </dl>
 
-  <div class="callout"><p><strong>Limites.</strong> {s.limitations || 'Non renseignées.'}</p></div>
+  <div class="note"><p><strong>Limites.</strong> {s.limitations || 'Non renseignées.'}</p></div>
 
   {s.corrections.length > 0 && (
-    <div class="callout info">
+    <div class="note info">
       <p><strong>Corrections v0.5.1</strong> (appliquées en surcouche ; le fichier d’origine reste intact)</p>
       <ul>{s.corrections.map((c) => <li>{c}</li>)}</ul>
     </div>
@@ -132,7 +132,7 @@ const evidenceLabel = { attested: 'attestée', hypothesis: 'non documentée', re
         {relations.map((r) => (
           <li>
             <code>{r.id}</code> : <code>{r.subject}</code> — {RELATION_LABEL[r.relation] ?? r.relation} — <code>{r.object}</code>
-            · statut <code>{r.status}</code> ({evidenceLabel[edgeEvidence(r)]}) · {r.locator}. <span class="muted">{r.note}</span>
+            : statut <code>{r.status}</code> ({evidenceLabel[edgeEvidence(r)]}), {r.locator}. <span class="muted">{r.note}</span>
           </li>
         ))}
       </ul>

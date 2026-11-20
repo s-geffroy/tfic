@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Frise from '../components/Frise.astro';
 import Regime from '../components/Regime.astro';
 import { dataset } from '../lib/data.ts';
 import { publicStats } from '../lib/stats.ts';
@@ -10,45 +11,69 @@ const st = s.v05AssertionStates;
 ---
 
 <Base title="Accueil" description="Programme de recherche sur l’identité culturelle du Père Noël : corpus sourcé, théorie formelle, protocole de test. Version de travail, aucun résultat expérimental." section="">
-  <p class="eyebrow">Programme de recherche · version de travail</p>
-  <h1>TFIC-PN — Identité culturelle du Père Noël</h1>
+  <h1>Le même personnage&nbsp;?</h1>
   <p class="lede">
-    Quand dit-on qu’un personnage reste « le même » alors que son costume, sa fonction, son nom et son entourage changent&nbsp;?
-    Le Père Noël sert de terrain d’essai. Le programme sépare trois questions qu’on confond d’ordinaire&nbsp;:{" "}<strong>reconnaître</strong> une figure, la <strong>co-identifier</strong> à une autre dans une culture donnée, et la{" "}<strong>relier historiquement</strong> à une autre par une transmission documentée.
+    Saint Nicolas en 1250, Father Christmas en 1616, Santa Claus en automobile en 1904 : quand dit-on qu’une figure reste la même alors
+    que son costume, sa fonction, son nom et son entourage changent&nbsp;? Ce programme prend le Père Noël comme terrain d’essai.
   </p>
 
-  <div class="grid" style="margin-top:1.5rem">
-    <a class="card" href={href('corpus')}><h3>Explorer le corpus</h3><p>Notices et témoins datés, localisés, avec leur niveau de preuve et leurs limites.</p></a>
-    <a class="card" href={href('theorie')}><h3>Comprendre la théorie</h3><p>Objets, relations, invariants et propositions, chacune avec son domaine de validité.</p></a>
-    <a class="card" href={href('laboratoire')}><h3>Tester les modèles</h3><p>Démonstrations sur données synthétiques&nbsp;: similarité, couverture, non-transitivité.</p></a>
+  <Frise />
+
+  <h2>Trois questions qu’on confond</h2>
+  <div class="app">
+    <div class="marge"><a href={href('theorie#relations')}>R</a></div>
+    <div class="corps"><p><strong>Reconnaître.</strong> Montré sans son nom, un document est-il identifié comme tel personnage, et par qui&nbsp;? Cela se mesure sur des réponses humaines, pas dans un catalogue.</p></div>
+  </div>
+  <div class="app">
+    <div class="marge"><a href={href('theorie#relations')}>Q</a></div>
+    <div class="corps"><p><strong>Co-identifier.</strong> Dans une culture et à une époque données, emploie-t-on deux noms pour la même figure&nbsp;? Dans <a href={href('corpus/S07')}>Karl Krinken</a> (1878), Santa Claus et Father Christmas sont deux personnages distincts.</p></div>
+  </div>
+  <div class="app">
+    <div class="marge"><a href={href('theorie#relations')}>H</a></div>
+    <div class="corps"><p><strong>Relier historiquement.</strong> Une figure dérive-t-elle d’une autre par une transmission documentée&nbsp;? Une ressemblance ne suffit jamais à l’établir.</p></div>
   </div>
 
-  <h2>Où en est le programme</h2>
-  <p>Ces nombres comptent des enregistrements, pas des performances. Les deux corpus se recouvrent : on ne les additionne pas.</p>
-  <div class="figures" role="list">
-    <div class="figure" role="listitem"><span class="n">{s.v04Records}</span><span class="l">notices du registre large (v0.4), {s.v04WorkFamilies} familles d’œuvres</span></div>
-    <div class="figure" role="listitem"><span class="n">{s.v05Witnesses}</span><span class="l">témoins ciblés (v0.5), dont {s.crosswalkLinks} appariés explicitement au registre v0.4</span></div>
-    <div class="figure" role="listitem"><span class="n">{s.v05Assertions}</span><span class="l">assertions pré-annotées en <em>une seule passe éditoriale</em> ({st['PRESENT'] ?? 0} attestées, {st['ABSENT'] ?? 0} niée, {st['UNKNOWN'] ?? 0} indéterminées)</span></div>
-    <div class="figure" role="listitem"><span class="n">{s.v05Relations}</span><span class="l">relations typées, dont les filiations non documentées laissées indéterminées</span></div>
-    <div class="figure" role="listitem"><span class="n">{s.stimulusCandidates}</span><span class="l">stimuli candidats, aucun administré</span></div>
-    <div class="figure zero" role="listitem"><span class="n">0</span><span class="l">participant interrogé</span></div>
-    <div class="figure zero" role="listitem"><span class="n">0</span><span class="l">double annotation indépendante</span></div>
-    <div class="figure zero" role="listitem"><span class="n">0</span><span class="l">métrique M0/M1/M2 mesurée</span></div>
+  <h2>Ce qui est établi, et ce qui ne l’est pas</h2>
+  <div class="app">
+    <div class="marge"><Regime kind="fait" /></div>
+    <div class="corps trait fait">
+      <p>
+        {s.v05Witnesses} témoins dépouillés, chacun à la date de l’édition réellement consultée, et un registre large de {s.v04Records} notices
+        ({s.v04WorkFamilies} familles d’œuvres). Les deux corpus se recouvrent et ne s’additionnent pas : {s.crosswalkLinks} témoins y sont
+        appariés œuvre par œuvre. <a href={href('corpus')}>Parcourir le corpus</a>
+      </p>
+    </div>
+  </div>
+  <div class="app">
+    <div class="marge"><Regime kind="hypothese" /></div>
+    <div class="corps trait hypothese">
+      <p>
+        {s.v05Assertions} assertions codées en une seule passe éditoriale, sans second codeur : {st['PRESENT'] ?? 0} attestées, {st['ABSENT'] ?? 0} niée
+        explicitement, {st['UNKNOWN'] ?? 0} indéterminées. Les filiations sans transmission documentée restent indéterminées.
+      </p>
+    </div>
+  </div>
+  <div class="app">
+    <div class="marge"><Regime kind="demo" /></div>
+    <div class="corps trait demo">
+      <p>
+        Quatre propositions élémentaires sur les modèles, dont la non-transitivité de la ressemblance. Elles ne prouvent rien sur l’histoire.{" "}
+        <a href={href('laboratoire')}>Les manipuler dans le laboratoire</a>
+      </p>
+    </div>
+  </div>
+  <div class="app">
+    <div class="marge"><Regime kind="experience" /></div>
+    <div class="corps trait experience">
+      <p>
+        Aucun. 0 participant, 0 double annotation indépendante, 0 mesure des modèles M0, M1 et M2. Le protocole est écrit, il n’a pas été
+        exécuté.{" "}<a href={href('methodologie')}>Lire le protocole et ses limites</a>
+      </p>
+    </div>
   </div>
 
-  <h2>Comment lire ce site</h2>
-  <p>Chaque contenu relève d’un des quatre régimes, signalés par une étiquette :</p>
-  <ul>
-    <li><Regime kind="fait" /> un document précisément localisé, avec la date de l’édition consultée et un lien vers l’institution.</li>
-    <li><Regime kind="hypothese" /> une inférence argumentée que les seules sources n’établissent pas.</li>
-    <li><Regime kind="demo" /> un résultat sur un modèle explicite. Il ne prouve rien sur l’histoire.</li>
-    <li><Regime kind="experience" /> réservé aux protocoles réellement exécutés. <strong>Aucun à ce jour.</strong></li>
-  </ul>
-  <div class="callout">
-    <p>
-      <strong>Ce que ce site ne fait pas.</strong> Il ne démontre pas l’existence du Père Noël et n’annonce aucun taux de reconnaissance.
-      Il ne calcule pas de « pourcentage d’ascendance » de saint Nicolas ou de Coca-Cola et ne déduit aucune filiation d’une ressemblance.
-      Le corpus est un échantillon <em>choisi</em> de contre-exemples : il ne dit rien de la fréquence réelle des pratiques.
-    </p>
-  </div>
+  <p class="muted" style="margin-top:2.4rem">
+    Le corpus rassemble des contre-exemples choisis : il réfute des définitions trop rigides (« toujours en traîneau », « toujours en rouge »),
+    il ne mesure pas la fréquence réelle des pratiques. Ce site ne calcule aucun « pourcentage d’ascendance » de saint Nicolas ou de Coca-Cola.
+  </p>
 </Base>

@@ -26,7 +26,7 @@ const EVID = { attested: 'attestée', hypothesis: 'non documentée', rejected: '
 ---
 
 <Base title={c.label} description={`Fiche ${c.label} : occurrences sourcées, relations typées et limites. ${text?.summary ?? ''}`.slice(0, 300)} section="personnages">
-  <p class="eyebrow"><a href={href('personnages')}>Personnages</a> · {KIND[c.kind]}</p>
+  <p class="ariane"><a href={href('personnages')}>Personnages</a> › {KIND[c.kind]}</p>
   <h1>{c.label}</h1>
   <p class="lede">{text?.summary}</p>
 
@@ -36,7 +36,7 @@ const EVID = { attested: 'attestée', hypothesis: 'non documentée', rejected: '
       <ul>{text.distinctions.map((t) => <li>{t}</li>)}</ul>
     </>
   )}
-  {text && <div class="callout"><p><strong>Limites.</strong> {text.limits}</p></div>}
+  {text && <div class="note"><p><strong>Limites.</strong> {text.limits}</p></div>}
 
   <h2>Occurrences dans les témoins v0.5</h2>
   {occ.length === 0 ? <p class="muted">Aucune.</p> : (

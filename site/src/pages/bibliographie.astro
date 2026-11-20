@@ -27,7 +27,6 @@ const support = [
 ---
 
 <Base title="Bibliographie" description="Bibliographie de provenance TFIC-PN : sources primaires, notices institutionnelles, traductions et références d’appui, avec leurs liens d’origine." section="bibliographie">
-  <p class="eyebrow">Provenance</p>
   <h1>Bibliographie</h1>
   <p class="lede">
     Chaque référence renvoie à l’institution qui la conserve. On distingue la source primaire consultée (et sous quelle forme),
@@ -38,9 +37,8 @@ const support = [
   <ol>
     {d.sourcesV05.map((s) => (
       <li>
-        {s.creator}, <cite>{s.title}</cite>, {s.dateLabel}. {s.witness}.
-        <span class="badge">{KIND[s.evidenceGrade] ?? gradeLabel(s.evidenceGrade)}</span>
-        <br /><a href={s.url} rel="noopener external">{s.url}</a> · <a href={href(`corpus/${s.id}`)}>fiche {s.id}</a>
+        {s.creator}, <cite>{s.title}</cite>, {s.dateLabel}. {s.witness}. <em class="muted">{KIND[s.evidenceGrade] ?? gradeLabel(s.evidenceGrade)}.</em>
+        <br /><a href={s.url} rel="noopener external">{s.url}</a>{" "}(<a href={href(`corpus/${s.id}`)}>fiche <span class="cote">{s.id}</span></a>)
       </li>
     ))}
   </ol>

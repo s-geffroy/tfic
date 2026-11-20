@@ -8,8 +8,4 @@ interface Props {
 const { state } = Astro.props;
 ---
 
-<span class={`badge s-${state}`} title={STATE_LABEL[state]}>{STATE_SHORT[state]}<span class="sr-only"> ({state})</span></span>
-
-<style>
-  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-</style>
+<span class={`etat-a s-${state}`} title={STATE_LABEL[state]}>{STATE_SHORT[state]}</span>

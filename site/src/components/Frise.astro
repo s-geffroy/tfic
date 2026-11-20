@@ -1,0 +1,132 @@
+---
+/**
+ * Frise du corpus, calculée à la compilation à partir des CSV publiés.
+ * Traits fins sous l'axe : les 51 notices du registre v0.4.
+ * Hampes nommées au-dessus : les 11 témoins v0.5 (liens vers leur fiche).
+ * Échelle en deux segments, signalée : 1200–1800 comprimé, 1800–1950 dilaté.
+ */
+import { dataset } from '../lib/data.ts';
+import { href } from '../lib/url.ts';
+
+const SHORT: Record<string, string> = {
+  S01: 'Jonson, masque',
+  S02: 'Old Santeclaus',
+  S03: 'A Visit from St. Nicholas',
+  S04: 'Schenkman',
+  S05: 'Sand',
+  S06: 'Nast, Santa au camp',
+  S07: 'Karl Krinken',
+  S08: 'Puck, automobile',
+  S09: 'Puck, Hands up!',
+  S10: 'Nikolaus und Krampus',
+  S11: 'Rudolph',
+};
+
+const d = dataset();
+const W = 1000;
+const L = 24;
+const R = 976;
+const SPLIT = 1800;
+const SPLIT_X = L + (R - L) * 0.26;
+const x = (y: number) =>
+  y <= SPLIT ? L + ((y - 1200) / (SPLIT - 1200)) * (SPLIT_X - L) : SPLIT_X + ((y - SPLIT) / (1950 - SPLIT)) * (R - SPLIT_X);
+const factor = Math.round(((R - SPLIT_X) / 150) / ((SPLIT_X - L) / 600));
+
+const AXIS = 196;
+const cross = new Map(d.crosswalk.map((c) => [c.v05, c.v04]));
+const v04 = new Map(d.sourcesV04.map((s) => [s.id, s]));
+
+const ticks = d.sourcesV04
+  .filter((s) => s.startYear !== null)
+  .map((s) => ({ id: s.id, x: x(s.startYear ?? 0), title: `${s.id} — ${s.title} (${s.dateLabel})` }));
+
+// Témoins v0.5 : rang d'étiquette attribué pour éviter les chevauchements.
+const rows = [30, 58, 86, 114, 142];
+const rowEnd = rows.map(() => -Infinity);
+const witnesses = [...d.sourcesV05]
+  .sort((a, b) => (a.startYear ?? 0) - (b.startYear ?? 0))
+  .map((s) => {
+    let lo = s.startYear ?? 0;
+    let hi = s.endYear ?? lo;
+    if (s.dateLabel.includes('?')) {
+      const alt = v04.get(cross.get(s.id) ?? '');
+      if (alt?.startYear && alt.endYear) [lo, hi] = [alt.startYear, alt.endYear];
+    }
+    const cx = x((lo + hi) / 2);
+    const label = `${SHORT[s.id] ?? s.title} ${(s.dateLabel.match(/\d{4}/) ?? [''])[0]}`.trim();
+    const width = label.length * 6.9 + 30;
+    // Près du bord droit, l'étiquette passe à gauche de la hampe.
+    const toLeft = cx + width > W;
+    const start = toLeft ? cx - width : cx;
+    let row = rows.findIndex((_, i) => (rowEnd[i] ?? 0) < start - 6);
+    if (row < 0) row = rows.length - 1;
+    rowEnd[row] = toLeft ? cx : cx + width;
+    return { s, cx, x0: x(lo), x1: x(hi), uncertain: hi > lo, y: rows[row] ?? 52, label, toLeft };
+  });
+
+const years = [1200, 1400, 1600, 1800, 1850, 1900, 1950];
+---
+
+<figure class="frise" aria-labelledby="frise-legende">
+  <div class="frise-scroll">
+    <svg viewBox={`0 0 ${W} 250`} role="group" aria-label="Frise chronologique du corpus, de 1200 à 1950">
+      <title>Frise du corpus : 51 notices v0.4 sous l’axe, 11 témoins v0.5 nommés au-dessus</title>
+      <line class="axe" x1={L} y1={AXIS} x2={R} y2={AXIS} />
+      <g class="rupture" aria-hidden="true">
+        <line x1={SPLIT_X - 4} y1={AXIS - 7} x2={SPLIT_X + 1} y2={AXIS + 7} />
+        <line x1={SPLIT_X + 1} y1={AXIS - 7} x2={SPLIT_X + 6} y2={AXIS + 7} />
+      </g>
+      {years.map((y) => (
+        <g class="an"><line x1={x(y)} y1={AXIS - 4} x2={x(y)} y2={AXIS + 4} /><text x={x(y)} y={AXIS + 44} text-anchor="middle">{y}</text></g>
+      ))}
+      <g class="v04">
+        {ticks.map((t) => <line x1={t.x} y1={AXIS + 7} x2={t.x} y2={AXIS + 26}><title>{t.title}</title></line>)}
+      </g>
+      {witnesses.map((w, i) => (
+        <a href={href(`corpus/${w.s.id}`)} class="temoin" style={`--i:${i}`} aria-label={`${w.s.id} : ${w.s.title}, ${w.s.dateLabel}`}>
+          <line class="hampe" x1={w.cx} y1={AXIS} x2={w.cx} y2={w.y + 6} />
+          {w.uncertain && <line class="intervalle" x1={w.x0} y1={AXIS} x2={w.x1} y2={AXIS} />}
+          <circle cx={w.cx} cy={AXIS} r="4.5" />
+          <text x={w.toLeft ? w.cx - 6 : w.cx + 6} y={w.y} text-anchor={w.toLeft ? 'end' : 'start'}><tspan class="cote">{w.s.id}</tspan> {w.label}</text>
+        </a>
+      ))}
+    </svg>
+  </div>
+  <p class="defile">Faites défiler la frise horizontalement pour voir les témoins de 1821 à 1939.</p>
+  <figcaption id="frise-legende">
+    Au-dessus de l’axe, les 11 témoins dépouillés (v0.5), à la date de l’édition consultée. Jonson est un intervalle :
+    témoin daté de 1615, représentation probable en 1616–1617. Sous l’axe, un trait par notice du registre large (v0.4).
+    L’échelle change en 1800 : un siècle après cette date occupe environ {factor} fois plus de place qu’avant.
+  </figcaption>
+</figure>
+
+<style>
+  .frise { margin: 1.6rem 0 0; }
+  .frise-scroll { overflow-x: auto; }
+  svg { display: block; width: 100%; min-width: 46rem; height: auto; font-family: var(--ui); }
+  .axe { stroke: var(--encre); stroke-width: 1.5; }
+  .rupture line { stroke: var(--encre); stroke-width: 1.5; }
+  .rupture { paint-order: stroke; }
+  .an line { stroke: var(--encre); stroke-width: 1; }
+  .an text { fill: var(--encre-2); font-size: 13px; font-variant-numeric: lining-nums; }
+  .v04 line { stroke: var(--encre-2); stroke-width: 1; opacity: 0.7; }
+  .temoin { color: var(--encre); text-decoration: none; }
+  .temoin .hampe { stroke: var(--encre); stroke-width: 1; }
+  .temoin .intervalle { stroke: var(--encre); stroke-width: 5; stroke-linecap: round; opacity: 0.35; }
+  .temoin circle { fill: var(--papier); stroke: var(--encre); stroke-width: 2; }
+  .temoin text { fill: var(--encre); font-size: 14px; }
+  .temoin .cote { font-weight: 500; fill: var(--encre-2); letter-spacing: 0.04em; }
+  .temoin:hover circle, .temoin:focus-visible circle { fill: var(--encre); }
+  .temoin:hover text, .temoin:focus-visible text { text-decoration: underline; }
+  .temoin:focus-visible { outline: none; }
+  .temoin:focus-visible .hampe { stroke-width: 3; }
+  .defile { display: none; font: italic 400 0.85rem / 1.4 var(--ui); color: var(--encre-2); margin: 0.4rem 0 0; }
+  @media (max-width: 46rem) { .defile { display: block; } }
+  figcaption { font: 400 0.9rem / 1.5 var(--ui); color: var(--encre-2); max-width: 44rem; margin-top: 0.6rem; }
+
+  /* Un seul moment animé : les hampes montent depuis l'axe au chargement. */
+  @media (prefers-reduced-motion: no-preference) {
+    .temoin { animation: monte 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--i) * 45ms + 120ms); }
+    @keyframes monte { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  }
+</style>

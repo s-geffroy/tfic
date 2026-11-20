@@ -32,7 +32,6 @@ const charsOf = (s: SourceEntry) => s.characterIds.map((c) => charLabel.get(c) ?
 ---
 
 <Base title="Corpus" description="Catalogue versionné des témoins TFIC-PN : 11 témoins ciblés (v0.5) et 51 notices de couverture large (v0.4), avec datation, niveau de preuve et limites." section="corpus">
-  <p class="eyebrow">Catalogue versionné</p>
   <h1>Corpus</h1>
   <p class="lede">
     Deux corpus <strong>distincts</strong> qui se recouvrent : 11 témoins ciblés et dépouillés (v0.5) et 51 notices de couverture
@@ -94,7 +93,7 @@ const charsOf = (s: SourceEntry) => s.characterIds.map((c) => charLabel.get(c) ?
         {d.sourcesV04.map((s) => (
           <tr {...rowAttrs(s)}>
             <th scope="row"><a href={href(`corpus/${s.id}`)}>{s.id}</a></th>
-            <td>{s.title}{s.corrections.length > 0 && <><br /><span class="badge" title="Correction en surcouche">corrigé v0.5.1</span></>}</td>
+            <td>{s.title}{s.corrections.length > 0 && <><br /><span class="mark-corr" title="Correction en surcouche">corrigé en v0.5.1</span></>}</td>
             <td>{s.dateLabel}</td>
             <td>{charsOf(s)}</td>
             <td>{s.area}</td>

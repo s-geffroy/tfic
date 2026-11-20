@@ -1,4 +1,12 @@
 ---
+import '@fontsource/alegreya/latin-400.css';
+import '@fontsource/alegreya/latin-400-italic.css';
+import '@fontsource/alegreya/latin-700.css';
+import '@fontsource/alegreya/latin-800.css';
+import '@fontsource/alegreya-sans/latin-400.css';
+import '@fontsource/alegreya-sans/latin-400-italic.css';
+import '@fontsource/alegreya-sans/latin-500.css';
+import '@fontsource/alegreya-sans/latin-500-italic.css';
 import 'katex/dist/katex.min.css';
 import '../styles/global.css';
 import { href } from '../lib/url.ts';
@@ -48,7 +56,7 @@ const nav = [
     <a class="skip" href="#contenu">Aller au contenu</a>
     <header class="site-head">
       <div class="wrap">
-        <a class="brand" href={href()}>TFIC-PN <span>· identité culturelle du Père Noël</span></a>
+        <a class="brand" href={href()} aria-label="TFIC-PN, accueil">TFIC-PN</a>
         <nav class="nav" aria-label="Navigation principale">
           <ul>
             {
@@ -64,11 +72,13 @@ const nav = [
         </nav>
       </div>
     </header>
-    <div class="status-band" role="note" aria-label="Statut de version">
+    <div class="etat" role="note" aria-label="Statut de version">
       <div class="wrap">
-        <span><strong>Science v{SCIENCE_VERSION} — {SCIENCE_STATUS}</strong> (non approuvé, non préenregistré, {SCIENCE_DATE})</span>
-        <span>Site v{SITE_VERSION}</span>
-        <span>Aucun résultat de reconnaissance humaine à ce jour</span>
+        <span>v{SCIENCE_VERSION}</span>
+        <p style="margin:0">
+          Version de travail {SCIENCE_VERSION} du {SCIENCE_DATE}, <strong>non approuvée</strong> et non préenregistrée
+          ({SCIENCE_STATUS}). Aucun résultat de reconnaissance humaine à ce jour. Site v{SITE_VERSION}.
+        </p>
       </div>
     </div>
     <main id="contenu" class="wrap">
@@ -76,12 +86,15 @@ const nav = [
     </main>
     <footer class="site-foot">
       <div class="wrap">
+        <span>TFIC-PN</span>
+        <div>
         <p>
           Programme de recherche TFIC-PN, version de travail. Textes et données dérivées sous{" "}
           <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.fr">CC BY-SA 4.0</a>, code sous licence MIT. Les sources
           citées restent sous les droits de leurs institutions : ce site n’héberge aucune reproduction d’archive.
         </p>
         <p>Aucun cookie, aucune mesure d’audience, aucune collecte de réponses.</p>
+        </div>
       </div>
     </footer>
   </body>
